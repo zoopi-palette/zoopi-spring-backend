@@ -1,74 +1,67 @@
-plugins {
-	id 'org.springframework.boot' version '2.6.4'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
-	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
-}
-
-group = 'com'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
+/**
+ * Gradle 빌드 전 실행되는 설정
+ */
+buildscript {
+	ext {
+		springBootVersion = '2.6.4'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath "io.spring.gradle:dependency-management-plugin:1.0.11.RELEASE"
 	}
 }
 
-repositories {
-	mavenCentral()
-}
+subprojects {
+	/**
+	 * Gradle 7.0 이상부터는 api 키워드를 사용할 수 있다.
+	 * api 키워드를 사용하기 위해서 'java' 플러그인 대신, 'java-library' 플러그인을 적용해야 한다.
+	 */
+	apply plugin: 'java-library'
+	apply plugin: 'org.springframework.boot'
+	apply plugin: 'io.spring.dependency-management'
 
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
-	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
-	implementation 'com.querydsl:querydsl-jpa'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'mysql:mysql-connector-java'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation 'com.h2database:h2'
-}
+	group = 'com.zoopi'
+	version = '0.0.1-SNAPSHOT'
+	sourceCompatibility = '11'
 
-tasks.named('test') {
-	useJUnitPlatform()
-}
+	repositories {
+		mavenCentral()
+	}
 
-//querydsl 추가
-def querydslDir = "$buildDir/generated/querydsl"
-
-querydsl {
-	library = "com.querydsl:querydsl-apt"
-	jpa = true
-	querydslSourcesDir = querydslDir
-}
-
-sourceSets {
-	main {
-		java {
-			srcDirs = ['src/main/java', querydslDir]
+	configurations {
+		compileOnly {
+			extendsFrom annotationProcessor
 		}
 	}
+
+	/**
+	 * 각 모듈에 공통으로 사용할 의존성
+	 */
+	dependencies {
+		annotationProcessor 'org.projectlombok:lombok'
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		testImplementation 'com.h2database:h2'
+	}
+
+	tasks.named('test') {
+		useJUnitPlatform()
+	}
 }
 
-compileQuerydsl{
-	options.annotationProcessorPath = configurations.querydsl
+/**
+ * 각각 module-api, module-service 모듈에 module-common 의존성을 추가
+ */
+project(':module-api') {
+	dependencies {
+		implementation project(':module-common')
+	}
 }
 
-configurations {
-	querydsl.extendsFrom compileClasspath
+project(':module-service') {
+	dependencies {
+		implementation project(':module-common')
+	}
 }
-
-compileQuerydsl.doFirst {
-	if(file(querydslDir).exists())
-		delete(file(querydslDir))
-}
-tasks.withType(JavaCompile) { options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir) }
-//querydsl 추가 끝

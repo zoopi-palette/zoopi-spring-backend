@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ZoopiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ZoopiApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(ZoopiApplication.class);
+    }
 }
