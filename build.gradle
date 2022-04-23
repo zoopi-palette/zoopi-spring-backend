@@ -57,11 +57,6 @@ subprojects {
 project(':module-api') {
 	dependencies {
 		implementation project(':module-common')
-	}
-}
-
-project(':module-service') {
-	dependencies {
-		implementation project(':module-common')
+		implementation project(':module-domain')
 	}
 }
