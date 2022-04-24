@@ -1,1 +1,4 @@
 rootProject.name = 'zoopi'
+include 'module-api'
+include 'module-common'
+include 'module-domain'
