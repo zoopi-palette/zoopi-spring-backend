@@ -9,13 +9,13 @@ import lombok.Getter;
 public class ResultResponse {
 
 	@ApiModelProperty(value = "HTTP 상태 코드")
-	private int status;
+	private final int status;
 	@ApiModelProperty(value = "Business 상태 코드")
-	private String code;
+	private final String code;
 	@ApiModelProperty(value = "응답 메세지")
-	private String message;
+	private final String message;
 	@ApiModelProperty(value = "응답 데이터")
-	private Object data;
+	private final Object data;
 
 	public static ResultResponse of(ResultCode resultCode, Object data) {
 		return new ResultResponse(resultCode, data);
