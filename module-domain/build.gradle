@@ -19,6 +19,7 @@ jar {
  * 따라서 compile(Gradle 7.0 미만) 혹은 api(Gradle 7.0 이상)으로 의존성을 추가해야 한다.
  */
 dependencies {
+    api 'org.springframework.boot:spring-boot-starter-validation'
     api 'org.springframework.boot:spring-boot-starter-web'
     api 'org.springframework.boot:spring-boot-starter-data-jpa'
     api 'org.springframework.boot:spring-boot-starter-security'
