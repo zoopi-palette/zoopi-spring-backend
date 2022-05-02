@@ -3,7 +3,7 @@
  */
 buildscript {
 	ext {
-		springBootVersion = '2.6.4'
+		springBootVersion = '2.5.4'
 	}
 	repositories {
 		mavenCentral()
@@ -43,7 +43,6 @@ subprojects {
 	dependencies {
 		annotationProcessor 'org.projectlombok:lombok'
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
-		testImplementation 'com.h2database:h2'
 	}
 
 	tasks.named('test') {
@@ -58,5 +57,11 @@ project(':module-api') {
 	dependencies {
 		implementation project(':module-common')
 		implementation project(':module-domain')
+	}
+}
+
+project(':module-domain') {
+	dependencies {
+		implementation project(':module-common')
 	}
 }
