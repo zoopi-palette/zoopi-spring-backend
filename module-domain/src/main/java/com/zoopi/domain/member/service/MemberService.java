@@ -17,4 +17,8 @@ public class MemberService {
 	public boolean validateEmail(String email) {
 		return memberRepository.findByEmail(email).isEmpty();
 	}
+
+	public boolean validatePhone(String phone) {
+		return memberRepository.findByPhone(phone).isEmpty();
+	}
 }
