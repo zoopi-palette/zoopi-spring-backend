@@ -49,4 +49,30 @@ class MemberServiceTest {
 		// then
 		assertThat(isValidated).isFalse();
 	}
+
+	@Test
+	void validatePhone_UniquePhone_True() throws Exception {
+	    // given
+		final String phone = "01012345678";
+		doReturn(Optional.empty()).when(memberRepository).findByPhone(phone);
+
+	    // when
+		final boolean isValidated = memberService.validatePhone(phone);
+
+		// then
+		assertThat(isValidated).isTrue();
+	}
+
+	@Test
+	void validatePhone_DuplicatePhone_False() throws Exception {
+	    // given
+		final String phone = "01012345678";
+		doReturn(Optional.of(mock(Member.class))).when(memberRepository).findByPhone(phone);
+
+	    // when
+		final boolean isValidated = memberService.validatePhone(phone);
+
+		// then
+		assertThat(isValidated).isFalse();
+	}
 }
