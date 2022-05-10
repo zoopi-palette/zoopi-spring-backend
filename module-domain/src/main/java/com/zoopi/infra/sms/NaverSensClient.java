@@ -72,9 +72,8 @@ public class NaverSensClient implements SmsClient {
 			return response.getStatusCode().is2xxSuccessful();
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw new RuntimeException(e.getMessage());
 		}
-
-		return false;
 	}
 
 	private String getSignature(String time) throws NoSuchAlgorithmException, InvalidKeyException {
@@ -108,6 +107,7 @@ public class NaverSensClient implements SmsClient {
 			this.content = content;
 			this.messages = messages;
 		}
+
 	}
 
 	@Getter
@@ -119,6 +119,7 @@ public class NaverSensClient implements SmsClient {
 		private String requestTime;
 		private String statusCode;
 		private String statusName;
+
 	}
 
 	@Getter
@@ -128,5 +129,7 @@ public class NaverSensClient implements SmsClient {
 
 		private String to;
 		private String content;
+
 	}
+
 }
