@@ -26,8 +26,8 @@ public class Authentication {
 	@Column(name = "authentication_code")
 	private String code;
 
-	@Column(name = "authentication_value")
-	private String value;
+	@Column(name = "authentication_phone")
+	private String phone;
 
 	@Column(name = "authentication_expire_date")
 	private LocalDateTime expiredDate;

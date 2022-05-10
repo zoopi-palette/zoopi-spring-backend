@@ -10,4 +10,7 @@ import com.zoopi.domain.authentication.entity.Authentication;
 public interface AuthenticationRepository extends JpaRepository<Authentication, String> {
 
 	List<Authentication> findAllByExpiredDateBefore(LocalDateTime now);
+
+	int countByPhoneAndExpiredDateAfter(String phone, LocalDateTime minusMinutes);
+
 }
