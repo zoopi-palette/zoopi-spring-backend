@@ -19,6 +19,7 @@ import com.zoopi.domain.authentication.dto.response.AuthenticationResult;
 import com.zoopi.domain.authentication.entity.Authentication;
 import com.zoopi.domain.authentication.repository.AuthenticationRepository;
 import com.zoopi.infra.sms.SmsClient;
+import com.zoopi.util.AuthenticationCodeUtils;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationServiceTest {
@@ -36,28 +37,44 @@ class AuthenticationServiceTest {
 	void sendAuthenticationCode_phone_sendSmsSuccess() throws Exception {
 		// given
 		final String phone = "01012345678";
+		final String authenticationCode = AuthenticationCodeUtils.generateRandomAuthenticationCode(6);
 		doReturn(true).when(smsClient).sendSms(any(String.class), any(String.class));
+
+		// when
+		final boolean result = authenticationService.sendAuthenticationCode(phone, authenticationCode);
+
+		// then
+		assertThat(result).isTrue();
+	}
+
+	@Test
+	void createAuthentication_codeAndPhone_success() throws Exception {
+		// given
+		final String phone = "01012345678";
+		final String authenticationCode = AuthenticationCodeUtils.generateRandomAuthenticationCode(6);
 		doReturn(Optional.empty()).when(authenticationRepository).findById(any(String.class));
 		doReturn(mock(Authentication.class)).when(authenticationRepository).save(any(Authentication.class));
 
 		// when
-		final boolean isPresent = authenticationService.sendAuthenticationCode(phone).isPresent();
+		final AuthenticationResponse authenticationResponse = authenticationService.createAuthentication(phone,
+			authenticationCode);
 
 		// then
-		assertThat(isPresent).isTrue();
+		assertThat(authenticationResponse).isNotNull();
 	}
 
 	@Test
-	void sendAuthenticationCode_phone_sendSmsFail() throws Exception {
+	void getCountOfAuthentication_3AuthenticationsWithin5Minutes_3() throws Exception {
 		// given
 		final String phone = "01012345678";
-		doReturn(false).when(smsClient).sendSms(any(String.class), any(String.class));
+		doReturn(3).when(authenticationRepository)
+			.countByPhoneAndExpiredDateAfter(any(String.class), any(LocalDateTime.class));
 
 		// when
-		final boolean isPresent = authenticationService.sendAuthenticationCode(phone).isPresent();
+		final int count = authenticationService.getCountOfAuthentication(phone);
 
 		// then
-		assertThat(isPresent).isFalse();
+		assertThat(count).isEqualTo(3);
 	}
 
 	@Test
@@ -162,4 +179,5 @@ class AuthenticationServiceTest {
 
 		// then
 	}
+
 }
