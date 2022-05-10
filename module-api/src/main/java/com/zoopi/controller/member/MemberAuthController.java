@@ -2,8 +2,6 @@ package com.zoopi.controller.member;
 
 import static com.zoopi.controller.ResultCode.*;
 
-import java.util.Optional;
-
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
@@ -25,7 +23,9 @@ import com.zoopi.controller.member.response.ValidationResponse;
 import com.zoopi.domain.authentication.dto.response.AuthenticationResponse;
 import com.zoopi.domain.authentication.dto.response.AuthenticationResult;
 import com.zoopi.domain.authentication.service.AuthenticationService;
+import com.zoopi.domain.authentication.service.BanService;
 import com.zoopi.domain.member.service.MemberService;
+import com.zoopi.util.AuthenticationCodeUtils;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -41,6 +41,10 @@ public class MemberAuthController {
 
 	private final MemberService memberService;
 	private final AuthenticationService authenticationService;
+	private final BanService banService;
+
+	private final int AUTHENTICATION_CODE_LENGTH = 6;
+	private final int MAX_SEND_COUNT = 5;
 
 	@ApiOperation(value = "이메일 유효성 검사")
 	@ApiImplicitParam(name = "email", value = "이메일", required = true, example = "zoopi@gmail.com")
@@ -79,11 +83,21 @@ public class MemberAuthController {
 	@ApiOperation(value = "휴대폰 본인 인증 문자 전송")
 	@ApiImplicitParam(name = "phone", value = "휴대폰 번호", required = true, example = "01012345678")
 	@PostMapping("/phone/send")
-	public ResponseEntity<ResultResponse> sendPhone(
+	public ResponseEntity<ResultResponse> sendAuthenticationCode(
 		@RequestParam @Pattern(regexp = "^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$") String phone) {
-		final Optional<AuthenticationResponse> result = authenticationService.sendAuthenticationCode(phone);
-		return result.map(response -> ResponseEntity.ok(ResultResponse.of(SEND_SMS_SUCCESS, response)))
-			.orElseGet(() -> ResponseEntity.ok(ResultResponse.of(SEND_SMS_FAILURE)));
+		if (banService.isBannedPhone(phone)) {
+			return ResponseEntity.ok(ResultResponse.of(PHONE_BANNED));
+		}
+
+		final String authenticationCode = AuthenticationCodeUtils.generateRandomAuthenticationCode(
+			AUTHENTICATION_CODE_LENGTH);
+		authenticationService.sendAuthenticationCode(phone, authenticationCode);
+		final AuthenticationResponse response = authenticationService.createAuthentication(phone, authenticationCode);
+		if (authenticationService.getCountOfAuthentication(phone) >= MAX_SEND_COUNT) {
+			banService.banPhone(phone);
+		}
+
+		return ResponseEntity.ok(ResultResponse.of(SEND_AUTHENTICATION_CODE_SUCCESS, response));
 	}
 
 	@ApiOperation(value = "인증 코드 확인")
@@ -117,4 +131,5 @@ public class MemberAuthController {
 
 		return ResponseEntity.ok(ResultResponse.of(DELETE_ALL_EXPIRED_AUTHENTICATION_CODES));
 	}
+
 }
