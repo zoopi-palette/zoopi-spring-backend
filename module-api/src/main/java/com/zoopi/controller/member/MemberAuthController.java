@@ -2,13 +2,11 @@ package com.zoopi.controller.member;
 
 import static com.zoopi.controller.ResultCode.*;
 
-import java.util.Optional;
-
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,11 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zoopi.controller.ResultCode;
 import com.zoopi.controller.ResultResponse;
 import com.zoopi.controller.member.request.AuthenticationCodeCheckRequest;
+import com.zoopi.controller.member.request.SignupRequest;
 import com.zoopi.controller.member.response.ValidationResponse;
 import com.zoopi.domain.authentication.dto.response.AuthenticationResponse;
 import com.zoopi.domain.authentication.dto.response.AuthenticationResult;
 import com.zoopi.domain.authentication.service.AuthenticationService;
+import com.zoopi.domain.authentication.service.BanService;
 import com.zoopi.domain.member.service.MemberService;
+import com.zoopi.util.AuthenticationCodeUtils;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -39,13 +40,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberAuthController {
 
+	private static final int AUTHENTICATION_CODE_LENGTH = 6;
+	private static final int MAX_SEND_COUNT = 5;
+
 	private final MemberService memberService;
 	private final AuthenticationService authenticationService;
+	private final BanService banService;
+
+	// TODO: @APiResponse 추가
 
 	@ApiOperation(value = "이메일 유효성 검사")
 	@ApiImplicitParam(name = "email", value = "이메일", required = true, example = "zoopi@gmail.com")
 	@PostMapping("/email/validate")
-	public ResponseEntity<ResultResponse> validateEmail(@RequestParam @Length(max = 30) @Email String email) {
+	public ResponseEntity<ResultResponse> validateEmail(@RequestParam @Size(max = 30) @Email String email) {
 		final boolean isValidated = memberService.validateEmail(email);
 		final ResultCode resultCode;
 		if (isValidated) {
@@ -75,15 +82,24 @@ public class MemberAuthController {
 		return ResponseEntity.ok(ResultResponse.of(resultCode, response));
 	}
 
-	// TODO: 회원가입 API에 휴대폰, 이메일 중복 체크 로직 추가
 	@ApiOperation(value = "휴대폰 본인 인증 문자 전송")
 	@ApiImplicitParam(name = "phone", value = "휴대폰 번호", required = true, example = "01012345678")
 	@PostMapping("/phone/send")
-	public ResponseEntity<ResultResponse> sendPhone(
+	public ResponseEntity<ResultResponse> sendAuthenticationCode(
 		@RequestParam @Pattern(regexp = "^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$") String phone) {
-		final Optional<AuthenticationResponse> result = authenticationService.sendAuthenticationCode(phone);
-		return result.map(response -> ResponseEntity.ok(ResultResponse.of(SEND_SMS_SUCCESS, response)))
-			.orElseGet(() -> ResponseEntity.ok(ResultResponse.of(SEND_SMS_FAILURE)));
+		if (banService.isBannedPhone(phone)) {
+			return ResponseEntity.ok(ResultResponse.of(PHONE_BANNED));
+		}
+
+		final String authenticationCode = AuthenticationCodeUtils.generateRandomAuthenticationCode(
+			AUTHENTICATION_CODE_LENGTH);
+		authenticationService.sendAuthenticationCode(phone, authenticationCode);
+		final AuthenticationResponse response = authenticationService.createAuthentication(phone, authenticationCode);
+		if (authenticationService.getCountOfAuthentication(phone) >= MAX_SEND_COUNT) {
+			banService.banPhone(phone);
+		}
+
+		return ResponseEntity.ok(ResultResponse.of(SEND_AUTHENTICATION_CODE_SUCCESS, response));
 	}
 
 	@ApiOperation(value = "인증 코드 확인")
@@ -117,4 +133,33 @@ public class MemberAuthController {
 
 		return ResponseEntity.ok(ResultResponse.of(DELETE_ALL_EXPIRED_AUTHENTICATION_CODES));
 	}
+
+	@ApiOperation(value = "이메일 회원 가입")
+	@PostMapping("/signup/email")
+	public ResponseEntity<ResultResponse> signupByEmail(@Valid @RequestBody SignupRequest request) {
+		authenticationService.validatePassword(request.getPassword(), request.getPasswordCheck());
+		if (!memberService.validateEmail(request.getEmail())) {
+			final ValidationResponse response = new ValidationResponse(request.getEmail(), false);
+			return ResponseEntity.ok(ResultResponse.of(EMAIL_DUPLICATE, response));
+		}
+		if (!memberService.validatePhone(request.getPhone())) {
+			final ValidationResponse response = new ValidationResponse(request.getPhone(), false);
+			return ResponseEntity.ok(ResultResponse.of(PHONE_DUPLICATE, response));
+		}
+
+		final AuthenticationResult result = authenticationService.validateAuthenticationKey(request.getPhone(),
+			request.getAuthenticationKey());
+		if (result.equals(AuthenticationResult.EXPIRED)) {
+			final ValidationResponse response = new ValidationResponse(request.getPhone(), false);
+			return ResponseEntity.ok(ResultResponse.of(AUTHENTICATION_KEY_EXPIRED, response));
+		} else if (result.equals(AuthenticationResult.NOT_AUTHENTICATED)) {
+			final ValidationResponse response = new ValidationResponse(request.getPhone(), false);
+			return ResponseEntity.ok(ResultResponse.of(AUTHENTICATION_KEY_NOT_AUTHENTICATED, response));
+		}
+
+		memberService.createMember(request.getEmail(), request.getPhone(), request.getName(), request.getPassword());
+
+		return ResponseEntity.ok(ResultResponse.of(SIGNUP_SUCCESS));
+	}
+
 }

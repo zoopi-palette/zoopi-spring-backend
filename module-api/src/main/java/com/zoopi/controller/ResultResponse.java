@@ -31,4 +31,5 @@ public class ResultResponse {
 		this.message = resultCode.getMessage();
 		this.data = data;
 	}
+
 }

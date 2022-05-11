@@ -14,4 +14,5 @@ public class AuthenticationResponse {
 
 	private String authenticationKey;
 	private LocalDateTime expiredDate;
+
 }

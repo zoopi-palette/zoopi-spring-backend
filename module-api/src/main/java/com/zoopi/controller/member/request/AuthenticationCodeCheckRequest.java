@@ -28,4 +28,5 @@ public class AuthenticationCodeCheckRequest {
 	@Length(min = 6, max = 6)
 	@ApiModelProperty(value = "인증 코드", required = true, example = "012345")
 	private String authenticationCode;
+
 }

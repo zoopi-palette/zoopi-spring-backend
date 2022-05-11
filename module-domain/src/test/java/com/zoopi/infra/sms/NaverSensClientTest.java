@@ -23,7 +23,7 @@ class NaverSensClientTest {
 
 	@Test
 	@Disabled
-	void sendSms_phoneAndContent_true() throws Exception {
+	void sendSms_PhoneAndContent_True() throws Exception {
 	    // given
 		final String content = "테스트";
 
@@ -33,4 +33,5 @@ class NaverSensClientTest {
 		// then
 		assertThat(result).isTrue();
 	}
+
 }
