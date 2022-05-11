@@ -11,7 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.zoopi.domain.member.entity.JoinType;
 import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.repository.MemberRepository;
 
@@ -20,6 +22,9 @@ class MemberServiceTest {
 
 	@Mock
 	private MemberRepository memberRepository;
+
+	@Mock
+	private PasswordEncoder passwordEncoder;
 
 	@InjectMocks
 	private MemberService memberService;
@@ -75,4 +80,22 @@ class MemberServiceTest {
 		// then
 		assertThat(isValidated).isFalse();
 	}
+
+	@Test
+	void createMember_EmailAndPhoneAndNameAndPassword_SuccessToSave() throws Exception {
+	    // given
+		final String email = "zoopi@gmail.com";
+		final String phone = "01012341234";
+		final String name = "주피";
+		final String password = "qlalfqjsgh1!";
+		final Member member = new Member(email, password, name, phone, JoinType.EMAIL);
+		doReturn(member).when(memberRepository).save(any(Member.class));
+
+	    // when
+		final Member savedMember = memberService.createMember(email, phone, name, password);
+
+		// then
+		assertThat(member).isEqualTo(savedMember);
+	}
+
 }
