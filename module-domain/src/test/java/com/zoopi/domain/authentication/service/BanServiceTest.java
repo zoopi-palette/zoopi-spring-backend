@@ -26,7 +26,7 @@ class BanServiceTest {
 	private BanService banService;
 
 	@Test
-	void isBannedPhone_notBannedPhone_false() throws Exception {
+	void isBannedPhone_NotBannedPhone_False() throws Exception {
 	    // given
 		final String phone = "01012341234";
 		doReturn(Optional.empty()).when(banRepository).findByPhone(any(String.class));
@@ -39,7 +39,7 @@ class BanServiceTest {
 	}
 
 	@Test
-	void isBannedPhone_bannedPhone_true() throws Exception {
+	void isBannedPhone_BannedPhone_True() throws Exception {
 	    // given
 		final String phone = "01012341234";
 		final Ban ban = new Ban(phone, LocalDateTime.now());
@@ -53,7 +53,7 @@ class BanServiceTest {
 	}
 
 	@Test
-	void isBannedPhone_justFreedPhone_false() throws Exception {
+	void isBannedPhone_JustFreedPhone_False() throws Exception {
 	    // given
 		final String phone = "01012341234";
 		final Ban ban = new Ban(phone, LocalDateTime.now().minusDays(1L));
@@ -67,7 +67,7 @@ class BanServiceTest {
 	}
 
 	@Test
-	void banPhone_phone_ban() throws Exception {
+	void banPhone_Phone_Ban() throws Exception {
 	    // given
 		final String phone = "01012341234";
 		doReturn(new Ban(phone, LocalDateTime.now())).when(banRepository).save(any(Ban.class));
