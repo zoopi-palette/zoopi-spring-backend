@@ -4,18 +4,23 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "authentications")
-@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Authentication {
 
@@ -29,6 +34,22 @@ public class Authentication {
 	@Column(name = "authentication_phone")
 	private String phone;
 
-	@Column(name = "authentication_expire_date")
-	private LocalDateTime expiredDate;
+	@CreatedDate
+	@Column(name = "authentication_create_date")
+	private LocalDateTime createdDate;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "authentication_status")
+	private AuthenticationStatus status;
+
+	public Authentication(String id, String code, String phone) {
+		this.id = id;
+		this.code = code;
+		this.phone = phone;
+		this.status = AuthenticationStatus.NOT_AUTHENTICATED;
+	}
+
+	public void authenticate() {
+		this.status = AuthenticationStatus.AUTHENTICATED;
+	}
 }
