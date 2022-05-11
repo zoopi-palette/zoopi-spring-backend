@@ -12,4 +12,5 @@ public class ValidationResponse {
 
 	private String value;
 	private boolean isValidated;
+
 }

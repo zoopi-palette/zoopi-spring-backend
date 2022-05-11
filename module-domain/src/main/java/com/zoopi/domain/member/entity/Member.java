@@ -21,7 +21,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 // TODO
-//  - 통신사 여부
 //  - 프로필 이미지
 
 @Entity
@@ -64,4 +63,5 @@ public class Member {
 		this.phone = phone;
 		this.joinType = joinType;
 	}
+
 }

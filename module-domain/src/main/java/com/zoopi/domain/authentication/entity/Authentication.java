@@ -52,4 +52,5 @@ public class Authentication {
 	public void authenticate() {
 		this.status = AuthenticationStatus.AUTHENTICATED;
 	}
+
 }
