@@ -35,8 +35,8 @@ public class Member {
 	@Column(name = "member_id")
 	private Long id;
 
-	@Column(name = "member_email", unique = true)
-	private String email;
+	@Column(name = "member_username", unique = true)
+	private String username;
 
 	@Column(name = "member_password")
 	private String password;
@@ -56,8 +56,8 @@ public class Member {
 	private JoinType joinType;
 
 	@Builder
-	public Member(String email, String password, String name, String phone, JoinType joinType) {
-		this.email = email;
+	public Member(String username, String password, String name, String phone, JoinType joinType) {
+		this.username = username;
 		this.password = password;
 		this.name = name;
 		this.phone = phone;
