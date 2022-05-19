@@ -97,6 +97,12 @@ public class ErrorResponse {
 			return fieldErrors;
 		}
 
+		public static List<FieldError> of(final String field, final String value, final ErrorCode errorCode) {
+			final List<FieldError> fieldErrors = new ArrayList<>();
+			fieldErrors.add(new FieldError(field, value, errorCode.getMessage()));
+			return fieldErrors;
+		}
+
 		private static List<FieldError> of(final BindingResult bindingResult) {
 			final List<org.springframework.validation.FieldError> fieldErrors = bindingResult.getFieldErrors();
 			return fieldErrors.stream()

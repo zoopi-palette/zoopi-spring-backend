@@ -8,7 +8,7 @@ import com.zoopi.domain.member.entity.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-	Optional<Member> findByEmail(String email);
+	Optional<Member> findByUsername(String username);
 
 	Optional<Member> findByPhone(String phone);
 

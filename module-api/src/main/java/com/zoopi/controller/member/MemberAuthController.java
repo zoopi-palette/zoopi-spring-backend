@@ -19,12 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zoopi.controller.ResultCode;
 import com.zoopi.controller.ResultResponse;
 import com.zoopi.controller.member.request.AuthenticationCodeCheckRequest;
+import com.zoopi.controller.member.request.SigninRequest;
 import com.zoopi.controller.member.request.SignupRequest;
 import com.zoopi.controller.member.response.ValidationResponse;
+import com.zoopi.domain.authentication.dto.JwtDto;
 import com.zoopi.domain.authentication.dto.response.AuthenticationResponse;
 import com.zoopi.domain.authentication.dto.response.AuthenticationResult;
 import com.zoopi.domain.authentication.service.AuthenticationService;
 import com.zoopi.domain.authentication.service.BanService;
+import com.zoopi.domain.member.entity.JoinType;
 import com.zoopi.domain.member.service.MemberService;
 import com.zoopi.util.AuthenticationCodeUtils;
 
@@ -82,6 +85,7 @@ public class MemberAuthController {
 		return ResponseEntity.ok(ResultResponse.of(resultCode, response));
 	}
 
+	// TODO: 비밀번호 찾기 API와 독립적으로 문자 전송 밴 처리
 	@ApiOperation(value = "휴대폰 본인 인증 문자 전송")
 	@ApiImplicitParam(name = "phone", value = "휴대폰 번호", required = true, example = "01012345678")
 	@PostMapping("/phone/send")
@@ -157,9 +161,19 @@ public class MemberAuthController {
 			return ResponseEntity.ok(ResultResponse.of(AUTHENTICATION_KEY_NOT_AUTHENTICATED, response));
 		}
 
-		memberService.createMember(request.getEmail(), request.getPhone(), request.getName(), request.getPassword());
+		memberService.createMember(request.getEmail(), request.getPhone(), request.getName(), request.getPassword(),
+			JoinType.EMAIL);
 
-		return ResponseEntity.ok(ResultResponse.of(SIGNUP_SUCCESS));
+		return ResponseEntity.ok(ResultResponse.of(SIGN_UP_SUCCESS));
+	}
+
+	// TODO: RefreshToken -> Cookie 저장
+	@ApiOperation(value = "이메일 로그인")
+	@PostMapping("/signin/email")
+	public ResponseEntity<ResultResponse> signinByEmail(@Valid @RequestBody SigninRequest request) {
+		final JwtDto jwtDto = memberService.signin(request.getEmail(), request.getPassword());
+
+		return ResponseEntity.ok(ResultResponse.of(SIGN_IN_SUCCESS, jwtDto));
 	}
 
 }
