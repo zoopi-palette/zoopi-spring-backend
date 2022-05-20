@@ -1,6 +1,7 @@
 package com.zoopi.controller.member;
 
 import static com.zoopi.controller.ResultCode.*;
+import static com.zoopi.domain.member.dto.SigninResponse.SigninResult.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
@@ -22,11 +23,11 @@ import com.zoopi.controller.member.request.AuthenticationCodeCheckRequest;
 import com.zoopi.controller.member.request.SigninRequest;
 import com.zoopi.controller.member.request.SignupRequest;
 import com.zoopi.controller.member.response.ValidationResponse;
-import com.zoopi.domain.authentication.dto.JwtDto;
 import com.zoopi.domain.authentication.dto.response.AuthenticationResponse;
 import com.zoopi.domain.authentication.dto.response.AuthenticationResult;
 import com.zoopi.domain.authentication.service.AuthenticationService;
 import com.zoopi.domain.authentication.service.BanService;
+import com.zoopi.domain.member.dto.SigninResponse;
 import com.zoopi.domain.member.entity.JoinType;
 import com.zoopi.domain.member.service.MemberService;
 import com.zoopi.util.AuthenticationCodeUtils;
@@ -161,8 +162,7 @@ public class MemberAuthController {
 			return ResponseEntity.ok(ResultResponse.of(AUTHENTICATION_KEY_NOT_AUTHENTICATED, response));
 		}
 
-		memberService.createMember(request.getEmail(), request.getPhone(), request.getName(), request.getPassword(),
-			JoinType.EMAIL);
+		memberService.createMember(request.getEmail(), request.getPhone(), request.getName(), request.getPassword(), JoinType.EMAIL);
 
 		return ResponseEntity.ok(ResultResponse.of(SIGN_UP_SUCCESS));
 	}
@@ -171,9 +171,17 @@ public class MemberAuthController {
 	@ApiOperation(value = "이메일 로그인")
 	@PostMapping("/signin/email")
 	public ResponseEntity<ResultResponse> signinByEmail(@Valid @RequestBody SigninRequest request) {
-		final JwtDto jwtDto = memberService.signin(request.getEmail(), request.getPassword());
+		final SigninResponse response = memberService.signin(request.getEmail(), request.getPassword());
+		final ResultCode resultCode;
+		if (response.getResult().equals(NONEXISTENT_USERNAME)) {
+			resultCode = MEMBER_USERNAME_NONEXISTENT;
+		} else if(response.getResult().equals(MISMATCHED_PASSWORD)) {
+			resultCode = MEMBER_PASSWORD_MISMATCHED;
+		} else {
+			resultCode = SIGN_IN_SUCCESS;
+		}
 
-		return ResponseEntity.ok(ResultResponse.of(SIGN_IN_SUCCESS, jwtDto));
+		return ResponseEntity.ok(ResultResponse.of(resultCode, response.getJwt()));
 	}
 
 }

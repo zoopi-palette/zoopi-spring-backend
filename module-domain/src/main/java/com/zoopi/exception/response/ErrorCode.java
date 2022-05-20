@@ -25,7 +25,6 @@ public enum ErrorCode {
 
 	// Member
 	MEMBER_NOT_FOUND(400, "E-M001", "존재하지 않는 회원입니다"),
-	MEMBER_PASSWORD_MISMATCHED(400, "E-M002", "회원 비밀번호가 올바르지 않습니다."),
 
 	;
 
