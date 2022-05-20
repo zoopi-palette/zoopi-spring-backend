@@ -2,6 +2,7 @@ package com.zoopi.domain.member.service;
 
 import static com.zoopi.exception.response.ErrorCode.*;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -26,11 +27,13 @@ public class MemberAuthorityService {
 	public List<MemberAuthority> getMemberAuthorities(String email) {
 		final Member member = memberRepository.findByUsername(email)
 			.orElseThrow(() -> new EntityNotFoundException(MEMBER_NOT_FOUND));
-		return memberAuthorityRepository.findAllByMember(member);
+		final List<MemberAuthority> memberAuthorities = memberAuthorityRepository.findAllByMember(member);
+		return List.copyOf(memberAuthorities);
 	}
 
 	public List<MemberAuthority> getMemberAuthorities(Member member) {
-		return memberAuthorityRepository.findAllByMember(member);
+		final List<MemberAuthority> memberAuthorities = memberAuthorityRepository.findAllByMember(member);
+		return List.copyOf(memberAuthorities);
 	}
 
 }
