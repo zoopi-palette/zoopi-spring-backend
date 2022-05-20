@@ -1,5 +1,6 @@
 package com.zoopi.domain.member.service;
 
+import static com.zoopi.domain.member.util.MemberUtils.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -168,27 +169,6 @@ class MemberServiceTest {
 		assertThat(response.getResult()).isEqualTo(SigninResponse.SigninResult.NONEXISTENT_USERNAME);
 		assertThat(response.getJwt().getAccessToken()).isEqualTo("");
 		assertThat(response.getJwt().getRefreshToken()).isEqualTo("");
-	}
-
-	public Member getMember(JoinType type) {
-		return Member.builder()
-			.joinType(type)
-			.phone("01012341234")
-			.name("홍길동")
-			.password("qlalfqjsgh1!")
-			.username("zoopi@gmail.com")
-			.build();
-	}
-
-	public List<MemberAuthority> getAuthorities(Member member, AuthorityType type) {
-		if (type.equals(AuthorityType.ROLE_USER)) {
-			return List.of(new MemberAuthority(member, AuthorityType.ROLE_USER));
-		} else if (type.equals(AuthorityType.ROLE_ADMIN)) {
-			return List.of(new MemberAuthority(member, AuthorityType.ROLE_USER),
-				new MemberAuthority(member, AuthorityType.ROLE_ADMIN));
-		} else {
-			return null;
-		}
 	}
 
 }
