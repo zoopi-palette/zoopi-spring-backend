@@ -8,16 +8,28 @@ import lombok.Getter;
 public enum ErrorCode {
 
 	// Global
-	INTERNAL_SERVER_ERROR(500, "G001", "내부 서버 오류입니다."),
-	INPUT_VALUE_INVALID(400, "G002", "입력 값이 유효하지 않습니다."),
-	INPUT_TYPE_INVALID(400, "G003", "입력 타입이 유효하지 않습니다."),
-	METHOD_NOT_ALLOWED(405, "G004", "허용되지 않은 HTTP method 입니다."),
-	HTTP_MESSAGE_NOT_READABLE(400, "G005", "HTTP Request Body 형식이 올바르지 않습니다."),
-	REQUEST_PARAMETER_MISSING(400, "G006", "요청 파라미터는 필수입니다."),
+	INTERNAL_SERVER_ERROR(500, "E-G001", "내부 서버 오류입니다."),
+	INPUT_VALUE_INVALID(400, "E-G002", "입력 값이 유효하지 않습니다."),
+	INPUT_TYPE_INVALID(400, "E-G003", "입력 타입이 유효하지 않습니다."),
+	METHOD_NOT_ALLOWED(405, "E-G004", "허용되지 않은 HTTP method 입니다."),
+	HTTP_MESSAGE_NOT_READABLE(400, "E-G005", "HTTP Request Body 형식이 올바르지 않습니다."),
+	REQUEST_PARAMETER_MISSING(400, "E-G006", "요청 파라미터는 필수입니다."),
+	REQUEST_HEADER_MISSING(400, "E-G007", "요청 헤더는 필수입니다."),
+
+	// Authorization
+	AUTHORIZATION_HEADER_MISSING(400, "E-A001", "인증 헤더는 필수입니다."),
+	INVALID_BEARER_PREFIX(400, "E-A002", "인증 헤더에 Bearer 접두사는 필수입니다."),
+	AUTHENTICATION_FAILURE(401, "E-A003", "인증에 실패하였습니다."),
+	INSUFFICIENT_AUTHORITY(403, "E-A004", "접근 권한이 부족합니다."),
+	PASSWORD_MISMATCHED(403, "E-A005", "비밀번호와 비밀번호 확인이 일치하지 않습니다."),
+
+	// Member
+	MEMBER_NOT_FOUND(400, "E-M001", "존재하지 않는 회원입니다"),
 
 	;
 
 	private final int status;
 	private final String code;
 	private final String message;
+
 }
