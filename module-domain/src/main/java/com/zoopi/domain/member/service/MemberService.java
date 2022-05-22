@@ -50,13 +50,17 @@ public class MemberService {
 			.build();
 		memberRepository.save(member);
 
+		saveMemberAuthority(member);
+
+		return member;
+	}
+
+	private void saveMemberAuthority(Member member) {
 		final MemberAuthority memberAuthority = MemberAuthority.builder()
 			.member(member)
 			.type(AuthorityType.ROLE_USER)
 			.build();
 		memberAuthorityRepository.save(memberAuthority);
-
-		return member;
 	}
 
 	public SigninResponse signin(String email, String password) {
@@ -72,11 +76,16 @@ public class MemberService {
 		}
 
 		final List<MemberAuthority> authorities = memberAuthorityRepository.findAllByMember(member);
+		final JwtDto jwt = generateJwt(member, authorities);
+
+		return new SigninResponse(jwt, SUCCESS);
+	}
+
+	private JwtDto generateJwt(Member member, List<MemberAuthority> authorities) {
 		final String accessToken = jwtUtils.generateJwt(member, authorities, JwtUtils.JwtType.ACCESS_TOKEN);
 		final String refreshToken = jwtUtils.generateJwt(member, authorities, JwtUtils.JwtType.REFRESH_TOKEN);
 
-		final JwtDto jwt = new JwtDto(accessToken, refreshToken);
-		return new SigninResponse(jwt, SUCCESS);
+		return new JwtDto(accessToken, refreshToken);
 	}
 
 }
