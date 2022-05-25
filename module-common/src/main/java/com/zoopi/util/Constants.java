@@ -9,5 +9,6 @@ public final class Constants {
 	public static final String ALL_PATTERN = "/**";
 	public static final String EMPTY = "";
 	public static final String SPACE = " ";
+	public static final String AUTHORIZATION_HEADER = "Authorization";
 
 }

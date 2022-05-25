@@ -1,7 +1,7 @@
 package com.zoopi.config.security.jwt;
 
 import static com.zoopi.exception.response.ErrorCode.*;
-import static com.zoopi.util.HttpServletRequestHeaderUtils.*;
+import static com.zoopi.util.Constants.*;
 
 import java.util.List;
 

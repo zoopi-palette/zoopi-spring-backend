@@ -19,7 +19,6 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 
 import com.zoopi.config.security.jwt.exception.JwtAuthenticationException;
 import com.zoopi.exception.InvalidRequestHeaderException;
-import com.zoopi.util.HttpServletRequestHeaderUtils;
 import com.zoopi.util.JwtUtils;
 
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
@@ -43,7 +42,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws
 		AuthenticationException {
-		final String authorizationHeader = HttpServletRequestHeaderUtils.extractAuthorizationHeader(request);
+		final String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
 		final String jwt;
 		try {
 			jwt = jwtUtils.extractJwt(authorizationHeader);
