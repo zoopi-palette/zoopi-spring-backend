@@ -2,6 +2,11 @@ package com.zoopi.config.security;
 
 import static com.zoopi.util.Constants.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -11,13 +16,17 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.zoopi.config.security.handler.CustomAccessDeniedHandler;
+import com.zoopi.config.security.handler.CustomAuthenticationEntryPoint;
 import com.zoopi.config.security.jwt.JwtAuthenticationFilter;
 import com.zoopi.config.security.jwt.JwtAuthenticationProvider;
+import com.zoopi.config.security.matcher.SkipPathRequestMatcher;
 import com.zoopi.config.security.oauth2.CustomOAuth2UserService;
 import com.zoopi.config.security.oauth2.OAuth2SuccessHandler;
 import com.zoopi.util.JwtUtils;
@@ -30,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private static final String[] AUTH_WHITELIST_SWAGGER = {"/v2/api-docs", "/configuration/ui",
 		"/swagger-resources/**", "/configuration/security", "/swagger-ui.html/**", "/webjars/**", "/swagger/**"};
-	private static final String[] AUTH_WHITELIST_GUEST = {"/auth/**", "/oauth2/**"};
+	private static final String[] AUTH_WHITELIST_GUEST = {"/", "/csrf", "/error", "/auth/**", "/oauth2/**"};
 	private static final String OAUTH2_REDIRECT_URI = "/oauth2/callback/*";
 
 	private final JwtUtils jwtUtils;
@@ -89,8 +98,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-		final JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtils, AUTH_WHITELIST_SWAGGER,
-			AUTH_WHITELIST_GUEST);
+		final List<String> skipPaths = new ArrayList<>();
+		skipPaths.addAll(Arrays.stream(AUTH_WHITELIST_SWAGGER).collect(Collectors.toList()));
+		skipPaths.addAll(Arrays.stream(AUTH_WHITELIST_GUEST).collect(Collectors.toList()));
+		final RequestMatcher matcher = new SkipPathRequestMatcher(skipPaths);
+		final JwtAuthenticationFilter filter = new JwtAuthenticationFilter(matcher, jwtUtils);
 		filter.setAuthenticationManager(super.authenticationManager());
 		return filter;
 	}

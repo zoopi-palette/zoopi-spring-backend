@@ -3,9 +3,6 @@ package com.zoopi.config.security.jwt;
 import static com.zoopi.util.Constants.*;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -16,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.zoopi.config.security.jwt.exception.JwtAuthenticationException;
 import com.zoopi.exception.InvalidRequestHeaderException;
@@ -24,19 +22,17 @@ import com.zoopi.util.JwtUtils;
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
 	private final JwtUtils jwtUtils;
-	private final Set<String> ignoreEndpoints = new HashSet<>();
+	private final RequestMatcher matcher;
 
-	public JwtAuthenticationFilter(JwtUtils jwtUtils, String[] ignoreEndpoints1, String[] ignoreEndpoints2) {
+	public JwtAuthenticationFilter(RequestMatcher matcher, JwtUtils jwtUtils) {
 		super(ALL_PATTERN);
 		this.jwtUtils = jwtUtils;
-		this.ignoreEndpoints.addAll(Arrays.asList(ignoreEndpoints1));
-		this.ignoreEndpoints.addAll(Arrays.asList(ignoreEndpoints2));
+		this.matcher = matcher;
 	}
 
 	@Override
 	protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
-		final String endpoint = request.getRequestURI();
-		return !ignoreEndpoints.contains(endpoint);
+		return matcher.matches(request);
 	}
 
 	@Override
