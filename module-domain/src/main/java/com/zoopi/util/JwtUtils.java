@@ -2,9 +2,7 @@ package com.zoopi.util;
 
 import static com.zoopi.exception.response.ErrorCode.*;
 import static com.zoopi.util.Constants.*;
-import static com.zoopi.util.HttpServletRequestHeaderUtils.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
@@ -28,7 +26,7 @@ import com.zoopi.config.security.jwt.JwtAuthenticationToken;
 import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.entity.MemberAuthority;
 import com.zoopi.exception.InvalidRequestHeaderException;
-import com.zoopi.exception.response.ErrorResponse;
+import com.zoopi.exception.response.ErrorResponse.FieldError;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -64,17 +62,12 @@ public class JwtUtils {
 	}
 
 	private void validateAuthorizationHeader(String authorizationHeader) throws InvalidRequestHeaderException {
-		final List<ErrorResponse.FieldError> errors;
 		if (authorizationHeader == null) {
-			errors = ErrorResponse.FieldError.of(AUTHORIZATION_HEADER, EMPTY, AUTHORIZATION_HEADER_MISSING);
+			throw new InvalidRequestHeaderException(FieldError.of(AUTHORIZATION_HEADER, EMPTY,
+				AUTHORIZATION_HEADER_MISSING));
 		} else if (!authorizationHeader.startsWith(TOKEN_TYPE + SPACE)) {
-			errors = ErrorResponse.FieldError.of(AUTHORIZATION_HEADER, authorizationHeader, BEARER_PREFIX_MISSING);
-		} else {
-			errors = new ArrayList<>();
-		}
-
-		if (!errors.isEmpty()) {
-			throw new InvalidRequestHeaderException(errors);
+			throw new InvalidRequestHeaderException(FieldError.of(AUTHORIZATION_HEADER, authorizationHeader,
+				BEARER_PREFIX_MISSING));
 		}
 	}
 
