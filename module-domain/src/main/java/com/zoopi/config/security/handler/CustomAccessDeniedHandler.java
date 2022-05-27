@@ -1,4 +1,4 @@
-package com.zoopi.config.security;
+package com.zoopi.config.security.handler;
 
 import static com.zoopi.exception.response.ErrorCode.*;
 
