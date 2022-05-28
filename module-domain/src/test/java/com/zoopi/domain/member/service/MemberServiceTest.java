@@ -3,7 +3,7 @@ package com.zoopi.domain.member.service;
 import static com.zoopi.domain.member.util.MemberUtils.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +47,7 @@ class MemberServiceTest {
 		// given
 		final String username = getMember(JoinType.EMAIL).getUsername();
 
-		doReturn(Optional.empty()).when(memberRepository).findByUsername(username);
+		given(memberRepository.findByUsername(username)).willReturn(Optional.empty());
 
 		// when
 		final boolean isValidated = memberService.validateEmail(username);
@@ -61,7 +61,7 @@ class MemberServiceTest {
 		// given
 		final String username = getMember(JoinType.EMAIL).getUsername();
 
-		doReturn(Optional.of(mock(Member.class))).when(memberRepository).findByUsername(username);
+		given(memberRepository.findByUsername(username)).willReturn(Optional.of(mock(Member.class)));
 
 		// when
 		final boolean isValidated = memberService.validateEmail(username);
@@ -75,7 +75,7 @@ class MemberServiceTest {
 		// given
 		final String phone = getMember(JoinType.EMAIL).getPhone();
 
-		doReturn(Optional.empty()).when(memberRepository).findByPhone(phone);
+		given(memberRepository.findByPhone(phone)).willReturn(Optional.empty());
 
 		// when
 		final boolean isValidated = memberService.validatePhone(phone);
@@ -89,7 +89,7 @@ class MemberServiceTest {
 		// given
 		final String phone = getMember(JoinType.EMAIL).getPhone();
 
-		doReturn(Optional.of(mock(Member.class))).when(memberRepository).findByPhone(phone);
+		given(memberRepository.findByPhone(phone)).willReturn(Optional.of(mock(Member.class)));
 
 		// when
 		final boolean isValidated = memberService.validatePhone(phone);
@@ -103,7 +103,7 @@ class MemberServiceTest {
 		// given
 		final Member member = getMember(JoinType.EMAIL);
 
-		doReturn(member).when(memberRepository).save(any(Member.class));
+		given(memberRepository.save(any(Member.class))).willReturn(member);
 
 		// when
 		final Member savedMember = memberService.createMember(member.getUsername(), member.getPhone(), member.getName(),
@@ -121,11 +121,11 @@ class MemberServiceTest {
 		final String accessToken = "accessToken";
 		final String refreshToken = "refreshToken";
 
-		doReturn(Optional.of(member)).when(memberRepository).findByUsername(any(String.class));
-		doReturn(true).when(passwordEncoder).matches(any(String.class), any(String.class));
-		doReturn(authorities).when(memberAuthorityRepository).findAllByMember(any(Member.class));
-		doReturn(accessToken).when(jwtUtils).generateJwt(member, authorities, JwtUtils.JwtType.ACCESS_TOKEN);
-		doReturn(refreshToken).when(jwtUtils).generateJwt(member, authorities, JwtUtils.JwtType.REFRESH_TOKEN);
+		given(memberRepository.findByUsername(any(String.class))).willReturn(Optional.of(member));
+		given(passwordEncoder.matches(any(String.class), any(String.class))).willReturn(true);
+		given(memberAuthorityRepository.findAllByMember(any(Member.class))).willReturn(authorities);
+		given(jwtUtils.generateJwt(member, authorities, JwtUtils.JwtType.ACCESS_TOKEN)).willReturn(accessToken);
+		given(jwtUtils.generateJwt(member, authorities, JwtUtils.JwtType.REFRESH_TOKEN)).willReturn(refreshToken);
 
 		// when
 		final SigninResponse response = memberService.signin(member.getUsername(), member.getPassword());
@@ -142,8 +142,8 @@ class MemberServiceTest {
 		final Member member = getMember(JoinType.EMAIL);
 		final String wrongPassword = "qlalfqjsgh2@";
 
-		doReturn(Optional.of(member)).when(memberRepository).findByUsername(any(String.class));
-		doReturn(false).when(passwordEncoder).matches(wrongPassword, member.getPassword());
+		given(memberRepository.findByUsername(any(String.class))).willReturn(Optional.of(member));
+		given(passwordEncoder.matches(wrongPassword, member.getPassword())).willReturn(false);
 
 		// when
 		final SigninResponse response = memberService.signin(member.getUsername(), wrongPassword);
@@ -160,7 +160,7 @@ class MemberServiceTest {
 		final String wrongUsername = "nop@gmail.com";
 		final String wrongPassword = "qlalfqjsgh2@";
 
-		doReturn(Optional.empty()).when(memberRepository).findByUsername(any(String.class));
+		given(memberRepository.findByUsername(any(String.class))).willReturn(Optional.empty());
 
 		// when
 		final SigninResponse response = memberService.signin(wrongUsername, wrongPassword);

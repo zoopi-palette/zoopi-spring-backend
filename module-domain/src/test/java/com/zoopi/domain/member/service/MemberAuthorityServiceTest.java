@@ -3,7 +3,7 @@ package com.zoopi.domain.member.service;
 import static com.zoopi.domain.member.util.MemberUtils.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,8 +41,8 @@ class MemberAuthorityServiceTest {
 		final Member member = getMember(JoinType.EMAIL);
 		final List<MemberAuthority> authorities = getAuthorities(member, AuthorityType.ROLE_USER);
 
-		doReturn(Optional.of(member)).when(memberRepository).findByUsername(member.getUsername());
-		doReturn(authorities).when(memberAuthorityRepository).findAllByMember(member);
+		given(memberRepository.findByUsername(member.getUsername())).willReturn(Optional.of(member));
+		given(memberAuthorityRepository.findAllByMember(member)).willReturn(authorities);
 
 		// when
 		final List<MemberAuthority> memberAuthorities = memberAuthorityService.getMemberAuthorities(
@@ -57,7 +57,7 @@ class MemberAuthorityServiceTest {
 		// given
 		final String username = "zoopi@gmail.com";
 
-		doReturn(Optional.empty()).when(memberRepository).findByUsername(username);
+		given(memberRepository.findByUsername(username)).willReturn(Optional.empty());
 
 		// when
 		final Executable executable = () -> memberAuthorityService.getMemberAuthorities(username);
@@ -72,7 +72,7 @@ class MemberAuthorityServiceTest {
 		final Member member = getMember(JoinType.EMAIL);
 		final List<MemberAuthority> authorities = getAuthorities(member, AuthorityType.ROLE_USER);
 
-		doReturn(authorities).when(memberAuthorityRepository).findAllByMember(member);
+		given(memberAuthorityRepository.findAllByMember(member)).willReturn(authorities);
 
 		// when
 		final List<MemberAuthority> memberAuthorities = memberAuthorityService.getMemberAuthorities(member);

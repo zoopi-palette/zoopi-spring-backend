@@ -2,7 +2,7 @@ package com.zoopi.domain.authentication.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,7 +43,8 @@ class AuthenticationServiceTest {
 		// given
 		final String phone = "01012345678";
 		final String authenticationCode = AuthenticationCodeUtils.generateRandomAuthenticationCode(6);
-		doReturn(true).when(smsClient).sendSms(any(String.class), any(String.class));
+
+		given(smsClient.sendSms(any(String.class), any(String.class))).willReturn(true);
 
 		// when
 		final boolean result = authenticationService.sendAuthenticationCode(phone, authenticationCode);
@@ -59,9 +60,11 @@ class AuthenticationServiceTest {
 		final String authenticationCode = AuthenticationCodeUtils.generateRandomAuthenticationCode(6);
 		final Authentication authentication = new Authentication(UUID.randomUUID().toString(), authenticationCode,
 			phone);
+
 		ReflectionTestUtils.setField(authentication, "createdDate", LocalDateTime.now());
-		doReturn(Optional.empty()).when(authenticationRepository).findById(any(String.class));
-		doReturn(authentication).when(authenticationRepository).save(any(Authentication.class));
+
+		given(authenticationRepository.findById(any(String.class))).willReturn(Optional.empty());
+		given(authenticationRepository.save(any(Authentication.class))).willReturn(authentication);
 
 		// when
 		final AuthenticationResponse authenticationResponse = authenticationService.createAuthentication(phone,
@@ -75,8 +78,9 @@ class AuthenticationServiceTest {
 	void getCountOfAuthentication_3AuthenticationsWithin5Minutes_3() throws Exception {
 		// given
 		final String phone = "01012345678";
-		doReturn(3).when(authenticationRepository)
-			.countByPhoneAndCreatedDateAfter(any(String.class), any(LocalDateTime.class));
+
+		given(authenticationRepository.countByPhoneAndCreatedDateAfter(any(String.class),
+			any(LocalDateTime.class))).willReturn(3);
 
 		// when
 		final int count = authenticationService.getCountOfAuthentication(phone);
@@ -91,7 +95,8 @@ class AuthenticationServiceTest {
 		final String authenticationKey = "2a6ec3d7-7147-4cdc-a6c5-fc5d937cfe76";
 		final String authenticationCode = "123456";
 		final String phone = "01012345678";
-		doReturn(Optional.empty()).when(authenticationRepository).findById(any(String.class));
+
+		given(authenticationRepository.findById(any(String.class))).willReturn(Optional.empty());
 
 		// when
 		final AuthenticationResult result = authenticationService.checkAuthenticationCode(
@@ -108,8 +113,10 @@ class AuthenticationServiceTest {
 		final String authenticationCode = "123456";
 		final String phone = "01012345678";
 		final Authentication authentication = new Authentication(authenticationKey, authenticationCode, phone);
+
 		ReflectionTestUtils.setField(authentication, "createdDate", LocalDateTime.now().minusMinutes(5L));
-		doReturn(Optional.of(authentication)).when(authenticationRepository).findById(any(String.class));
+
+		given(authenticationRepository.findById(any(String.class))).willReturn(Optional.of(authentication));
 
 		// when
 		final AuthenticationResult result = authenticationService.checkAuthenticationCode(
@@ -126,8 +133,10 @@ class AuthenticationServiceTest {
 		final String authenticationCode = "123456";
 		final String phone = "01012345678";
 		final Authentication authentication = new Authentication(authenticationKey, authenticationCode, phone);
+
 		ReflectionTestUtils.setField(authentication, "createdDate", LocalDateTime.now());
-		doReturn(Optional.of(authentication)).when(authenticationRepository).findById(any(String.class));
+
+		given(authenticationRepository.findById(any(String.class))).willReturn(Optional.of(authentication));
 
 		// when
 		final AuthenticationResult result = authenticationService.checkAuthenticationCode(
@@ -145,8 +154,10 @@ class AuthenticationServiceTest {
 		final String wrongAuthenticationCode = "634262";
 		final String phone = "01012345678";
 		final Authentication authentication = new Authentication(authenticationKey, authenticationCode, phone);
+
 		ReflectionTestUtils.setField(authentication, "createdDate", LocalDateTime.now());
-		doReturn(Optional.of(authentication)).when(authenticationRepository).findById(any(String.class));
+
+		given(authenticationRepository.findById(any(String.class))).willReturn(Optional.of(authentication));
 
 		// when
 		final AuthenticationResult result = authenticationService.checkAuthenticationCode(
@@ -164,8 +175,10 @@ class AuthenticationServiceTest {
 		final String phone = "01012345678";
 		final String otherPhone = "01012341234";
 		final Authentication authentication = new Authentication(authenticationKey, authenticationCode, otherPhone);
+
 		ReflectionTestUtils.setField(authentication, "createdDate", LocalDateTime.now());
-		doReturn(Optional.of(authentication)).when(authenticationRepository).findById(any(String.class));
+
+		given(authenticationRepository.findById(any(String.class))).willReturn(Optional.of(authentication));
 
 		// when
 		final AuthenticationResult result = authenticationService.checkAuthenticationCode(
@@ -178,9 +191,8 @@ class AuthenticationServiceTest {
 	@Test
 	void deleteExpiredAuthenticationCodes_Success() throws Exception {
 		// given
-		doReturn(new ArrayList<>())
-			.when(authenticationRepository)
-			.findAllByStatusAndCreatedDateAfter(any(AuthenticationStatus.class), any(LocalDateTime.class));
+		given(authenticationRepository.findAllByStatusAndCreatedDateAfter(any(AuthenticationStatus.class),
+			any(LocalDateTime.class))).willReturn(new ArrayList<>());
 
 		// when
 		final boolean result = authenticationService.deleteExpiredAuthenticationCodes();
@@ -220,7 +232,8 @@ class AuthenticationServiceTest {
 		// given
 		final String phone = "01012341234";
 		final String authenticationKey = UUID.randomUUID().toString();
-		doReturn(Optional.empty()).when(authenticationRepository).findById(any(String.class));
+
+		given(authenticationRepository.findById(any(String.class))).willReturn(Optional.empty());
 
 		// when
 		final AuthenticationResult result = authenticationService.validateAuthenticationKey(phone, authenticationKey);
@@ -236,8 +249,10 @@ class AuthenticationServiceTest {
 		final String authenticationKey = UUID.randomUUID().toString();
 		final String authenticationCode = "123456";
 		final Authentication authentication = new Authentication(authenticationKey, authenticationCode, phone);
+
 		ReflectionTestUtils.setField(authentication, "createdDate", LocalDateTime.now().minusMinutes(60L));
-		doReturn(Optional.of(authentication)).when(authenticationRepository).findById(any(String.class));
+
+		given(authenticationRepository.findById(any(String.class))).willReturn(Optional.of(authentication));
 
 		// when
 		final AuthenticationResult result = authenticationService.validateAuthenticationKey(phone, authenticationKey);
@@ -254,8 +269,10 @@ class AuthenticationServiceTest {
 		final String authenticationCode = "123456";
 		final Authentication authentication = new Authentication(authenticationKey, authenticationCode, phone);
 		authentication.authenticate();
+
 		ReflectionTestUtils.setField(authentication, "createdDate", LocalDateTime.now().minusMinutes(10L));
-		doReturn(Optional.of(authentication)).when(authenticationRepository).findById(any(String.class));
+
+		given(authenticationRepository.findById(any(String.class))).willReturn(Optional.of(authentication));
 
 		// when
 		final AuthenticationResult result = authenticationService.validateAuthenticationKey(phone, authenticationKey);
@@ -271,8 +288,10 @@ class AuthenticationServiceTest {
 		final String authenticationKey = UUID.randomUUID().toString();
 		final String authenticationCode = "123456";
 		final Authentication authentication = new Authentication(authenticationKey, authenticationCode, phone);
+
 		ReflectionTestUtils.setField(authentication, "createdDate", LocalDateTime.now().minusMinutes(10L));
-		doReturn(Optional.of(authentication)).when(authenticationRepository).findById(any(String.class));
+
+		given(authenticationRepository.findById(any(String.class))).willReturn(Optional.of(authentication));
 
 		// when
 		final AuthenticationResult result = authenticationService.validateAuthenticationKey(phone, authenticationKey);
@@ -290,8 +309,10 @@ class AuthenticationServiceTest {
 		final String authenticationCode = "123456";
 		final Authentication authentication = new Authentication(authenticationKey, authenticationCode, otherPhone);
 		authentication.authenticate();
+
 		ReflectionTestUtils.setField(authentication, "createdDate", LocalDateTime.now().minusMinutes(10L));
-		doReturn(Optional.of(authentication)).when(authenticationRepository).findById(any(String.class));
+
+		given(authenticationRepository.findById(any(String.class))).willReturn(Optional.of(authentication));
 
 		// when
 		final AuthenticationResult result = authenticationService.validateAuthenticationKey(phone, authenticationKey);
