@@ -2,7 +2,7 @@ package com.zoopi.domain.authentication.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -29,7 +29,8 @@ class BanServiceTest {
 	void isBannedPhone_NotBannedPhone_False() throws Exception {
 	    // given
 		final String phone = "01012341234";
-		doReturn(Optional.empty()).when(banRepository).findByPhone(any(String.class));
+
+		given(banRepository.findByPhone(any(String.class))).willReturn(Optional.empty());
 
 	    // when
 		final boolean isBanned = banService.isBannedPhone(phone);
@@ -43,7 +44,8 @@ class BanServiceTest {
 	    // given
 		final String phone = "01012341234";
 		final Ban ban = new Ban(phone, LocalDateTime.now());
-		doReturn(Optional.of(ban)).when(banRepository).findByPhone(any(String.class));
+
+		given(banRepository.findByPhone(any(String.class))).willReturn(Optional.of(ban));
 
 	    // when
 		final boolean isBanned = banService.isBannedPhone(phone);
@@ -56,8 +58,9 @@ class BanServiceTest {
 	void isBannedPhone_JustFreedPhone_False() throws Exception {
 	    // given
 		final String phone = "01012341234";
-		final Ban ban = new Ban(phone, LocalDateTime.now().minusDays(1L));
-		doReturn(Optional.of(ban)).when(banRepository).findByPhone(any(String.class));
+		final Ban ban = new Ban(phone, LocalDateTime.now().minusDays(2L));
+
+		given(banRepository.findByPhone(any(String.class))).willReturn(Optional.of(ban));
 
 	    // when
 		final boolean isBanned = banService.isBannedPhone(phone);
@@ -70,7 +73,8 @@ class BanServiceTest {
 	void banPhone_Phone_Ban() throws Exception {
 	    // given
 		final String phone = "01012341234";
-		doReturn(new Ban(phone, LocalDateTime.now())).when(banRepository).save(any(Ban.class));
+
+		given(banRepository.save(any(Ban.class))).willReturn(new Ban(phone, LocalDateTime.now()));
 
 	    // when
 		final Ban ban = banService.banPhone(phone);
