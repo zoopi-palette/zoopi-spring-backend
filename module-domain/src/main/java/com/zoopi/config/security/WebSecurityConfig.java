@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -60,6 +61,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
 	}
 
+	@Bean
+	public AuthenticationEntryPointFailureHandler authenticationEntryPointFailureHandler() {
+		return new AuthenticationEntryPointFailureHandler(authenticationEntryPoint);
+	}
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
@@ -90,6 +96,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 
 			.successHandler(oAuth2SuccessHandler)
+			.failureHandler(authenticationEntryPointFailureHandler())
 			.userInfoEndpoint().userService(oAuth2UserService)
 		;
 
@@ -104,6 +111,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		final RequestMatcher matcher = new SkipPathRequestMatcher(skipPaths);
 		final JwtAuthenticationFilter filter = new JwtAuthenticationFilter(matcher, jwtUtils);
 		filter.setAuthenticationManager(super.authenticationManager());
+		filter.setAuthenticationFailureHandler(authenticationEntryPointFailureHandler());
 		return filter;
 	}
 
