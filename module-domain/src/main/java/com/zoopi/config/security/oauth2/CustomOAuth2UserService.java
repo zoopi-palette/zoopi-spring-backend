@@ -1,9 +1,11 @@
 package com.zoopi.config.security.oauth2;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -12,12 +14,11 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
+import com.zoopi.config.security.oauth2.exception.UnsupportedPlatformSignInException;
 import com.zoopi.domain.member.entity.JoinType;
 import com.zoopi.domain.member.entity.MemberAuthority;
-import com.zoopi.domain.member.entity.oauth2.KakaoAccount;
 import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.entity.oauth2.NaverAccount;
-import com.zoopi.domain.member.repository.oauth2.KakaoAccountRepository;
 import com.zoopi.domain.member.repository.oauth2.NaverAccountRepository;
 import com.zoopi.domain.member.service.MemberAuthorityService;
 import com.zoopi.domain.member.service.MemberService;
@@ -30,8 +31,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 	private final MemberService memberService;
 	private final MemberAuthorityService memberAuthorityService;
-	private final KakaoAccountRepository kakaoAccountRepository;
 	private final NaverAccountRepository naverAccountRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -47,17 +48,17 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		final Long id = Long.valueOf(userNameAttributeName);
 
 		final boolean isFirstLogin;
-		if (registrationId.equals(OAuth2Attributes.KAKAO)) {
-			isFirstLogin = kakaoAccountRepository.findById(id).isEmpty();
-		} else {
+		if (registrationId.equals(OAuth2Attributes.NAVER)) {
 			isFirstLogin = naverAccountRepository.findById(id).isEmpty();
+		} else {
+			throw new UnsupportedPlatformSignInException();
 		}
 
 		final List<SimpleGrantedAuthority> authorities;
 		final String email = oAuth2Attributes.getEmail();
-		final String nickname = oAuth2Attributes.getNickname();
+		final String phone = oAuth2Attributes.getPhone();
 		if (isFirstLogin) {
-			final Member member = signup(registrationId, id, email, nickname);
+			final Member member = signup(registrationId, id, email, phone);
 			authorities = memberAuthorityService.getMemberAuthorities(member).stream()
 				.map(MemberAuthority::getType)
 				.map(Enum::name)
@@ -74,15 +75,16 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		return new DefaultOAuth2User(authorities, oAuth2Attributes.convertToMap(), oAuth2Attributes.getAttributeKey());
 	}
 
-	private Member signup(String provider, Long id, String email, String nickname) {
+	private Member signup(String provider, Long id, String email, String phone) {
 		final Member member;
-		if (provider.equals(OAuth2Attributes.KAKAO)) {
-			member = memberService.createMember(email, "", nickname, "", JoinType.KAKAO);
-			kakaoAccountRepository.save(new KakaoAccount(id, member));
-		} else {
-			member = memberService.createMember(email, "", nickname, "", JoinType.NAVER);
+		final String password = passwordEncoder.encode(UUID.randomUUID().toString());
+		if (provider.equals(OAuth2Attributes.NAVER)) {
+			member = memberService.createMember(email, phone, "", password, JoinType.NAVER);
 			naverAccountRepository.save(new NaverAccount(id, member));
+		} else {
+			throw new UnsupportedPlatformSignInException();
 		}
+
 		return member;
 	}
 
