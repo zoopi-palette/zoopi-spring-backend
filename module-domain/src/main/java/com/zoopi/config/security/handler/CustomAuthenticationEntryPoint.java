@@ -1,7 +1,5 @@
 package com.zoopi.config.security.handler;
 
-import static com.zoopi.exception.response.ErrorCode.*;
-
 import java.io.OutputStream;
 import java.util.List;
 
@@ -15,7 +13,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zoopi.config.security.jwt.exception.JwtAuthenticationException;
+import com.zoopi.config.security.exception.CustomAuthenticationException;
+import com.zoopi.exception.response.ErrorCode;
 import com.zoopi.exception.response.ErrorResponse;
 
 @Component
@@ -24,10 +23,11 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 		AuthenticationException authException) {
-		final JwtAuthenticationException exception = (JwtAuthenticationException)authException;
-		final int status = AUTHENTICATION_FAILURE.getStatus();
-		final String code = AUTHENTICATION_FAILURE.getCode();
-		final String message = AUTHENTICATION_FAILURE.getMessage();
+		final CustomAuthenticationException exception = (CustomAuthenticationException)authException;
+		final ErrorCode errorCode = exception.getErrorCode();
+		final int status = errorCode.getStatus();
+		final String code = errorCode.getCode();
+		final String message = errorCode.getMessage();
 		final List<ErrorResponse.FieldError> errors = exception.getErrors();
 		final ErrorResponse errorResponse = ErrorResponse.of(status, code, message, errors);
 

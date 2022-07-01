@@ -22,6 +22,9 @@ public enum ErrorCode {
 	AUTHENTICATION_FAILURE(401, "E-A003", "인증에 실패하였습니다."),
 	INSUFFICIENT_AUTHORITY(403, "E-A004", "접근 권한이 부족합니다."),
 
+	// OAuth2
+	UNSUPPORTED_PLATFORM_SIGN_IN(400, "E-O001", "지원하지 않는 플랫폼 로그인입니다."),
+
 	// Jwt
 	JWT_INVALID(400, "E-J001", "유효하지 않은 토큰입니다."),
 	JWT_EXPIRED(400, "E-J002", "만료된 토큰입니다."),
