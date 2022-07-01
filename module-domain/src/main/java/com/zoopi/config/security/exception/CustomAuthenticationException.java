@@ -11,7 +11,7 @@ import com.zoopi.exception.response.ErrorResponse;
 import lombok.Getter;
 
 @Getter
-public class CustomAuthenticationException extends AuthenticationException {
+public abstract class CustomAuthenticationException extends AuthenticationException {
 
 	private final ErrorCode errorCode;
 	private final List<ErrorResponse.FieldError> errors;
