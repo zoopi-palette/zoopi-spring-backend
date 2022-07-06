@@ -44,7 +44,7 @@ public class AuthenticationService {
 		final Authentication authentication = authenticationRepository.save(
 			new Authentication(uuid, authenticationCode, phone));
 
-		final LocalDateTime expiredDate = authentication.getCreatedDate()
+		final LocalDateTime expiredDate = authentication.getCreatedAt()
 			.plusMinutes(AUTHENTICATION_CODE_VALID_MINUTES);
 		return new AuthenticationResponse(uuid, expiredDate);
 	}
@@ -65,7 +65,7 @@ public class AuthenticationService {
 		}
 
 		final Authentication authentication = authenticationOptional.get();
-		final boolean isExpired = authentication.getCreatedDate()
+		final boolean isExpired = authentication.getCreatedAt()
 			.plusMinutes(AUTHENTICATION_CODE_VALID_MINUTES)
 			.isBefore(now);
 		final boolean isMatch = authentication.getCode().equals(authenticationCode);
@@ -109,7 +109,7 @@ public class AuthenticationService {
 		}
 
 		final Authentication authentication = authenticationOptional.get();
-		final boolean isExpired = authentication.getCreatedDate()
+		final boolean isExpired = authentication.getCreatedAt()
 			.plusMinutes(AUTHENTICATION_KEY_VALID_MINUTES)
 			.isBefore(now);
 		final boolean isMine = authentication.getPhone().equals(phone);
