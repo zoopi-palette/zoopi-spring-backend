@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.zoopi.domain.member.entity.oauth2.SnsAccountPrimaryKey;
+import com.zoopi.domain.member.entity.oauth2.SnsProvider;
+import com.zoopi.domain.member.service.SnsAccountService;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -14,12 +18,8 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
-import com.zoopi.config.security.oauth2.exception.UnsupportedPlatformSignInException;
-import com.zoopi.domain.member.entity.JoinType;
 import com.zoopi.domain.member.entity.MemberAuthority;
 import com.zoopi.domain.member.entity.Member;
-import com.zoopi.domain.member.entity.oauth2.NaverAccount;
-import com.zoopi.domain.member.repository.oauth2.NaverAccountRepository;
 import com.zoopi.domain.member.service.MemberAuthorityService;
 import com.zoopi.domain.member.service.MemberService;
 
@@ -31,7 +31,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 	private final MemberService memberService;
 	private final MemberAuthorityService memberAuthorityService;
-	private final NaverAccountRepository naverAccountRepository;
+	private final SnsAccountService snsAccountService;
 	private final PasswordEncoder passwordEncoder;
 
 	@Override
@@ -45,20 +45,18 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 		final OAuth2Attributes oAuth2Attributes = OAuth2Attributes.of(registrationId, userNameAttributeName,
 			oAuth2User.getAttributes());
-		final Long id = Long.valueOf(userNameAttributeName);
 
-		final boolean isFirstLogin;
-		if (registrationId.equals(OAuth2Attributes.NAVER)) {
-			isFirstLogin = naverAccountRepository.findById(id).isEmpty();
-		} else {
-			throw new UnsupportedPlatformSignInException();
-		}
+		final SnsProvider provider = SnsProvider.valueOf(registrationId);
+		final SnsAccountPrimaryKey primaryKey = new SnsAccountPrimaryKey(provider, userNameAttributeName);
+
+		final boolean isFirstLogin = snsAccountService.get(primaryKey).isEmpty();
 
 		final List<SimpleGrantedAuthority> authorities;
 		final String email = oAuth2Attributes.getEmail();
 		final String phone = oAuth2Attributes.getPhone();
+
 		if (isFirstLogin) {
-			final Member member = signup(registrationId, id, email, phone);
+			final Member member = signup(primaryKey, email, phone);
 			authorities = memberAuthorityService.getMemberAuthorities(member).stream()
 				.map(MemberAuthority::getType)
 				.map(Enum::name)
@@ -75,15 +73,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		return new DefaultOAuth2User(authorities, oAuth2Attributes.convertToMap(), oAuth2Attributes.getAttributeKey());
 	}
 
-	private Member signup(String provider, Long id, String email, String phone) {
-		final Member member;
+	private Member signup(SnsAccountPrimaryKey primaryKey, String email, String phone) {
+		final String username = "user_" + System.currentTimeMillis();
 		final String password = passwordEncoder.encode(UUID.randomUUID().toString());
-		if (provider.equals(OAuth2Attributes.NAVER)) {
-			member = memberService.createMember(email, phone, "", password, JoinType.NAVER);
-			naverAccountRepository.save(new NaverAccount(id, member));
-		} else {
-			throw new UnsupportedPlatformSignInException();
-		}
+		final Member member = memberService.createMember(username, phone, "", password, email);
+		snsAccountService.connect(member, primaryKey);
 
 		return member;
 	}
