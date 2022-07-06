@@ -1,13 +1,13 @@
 package com.zoopi.domain.authentication.entity;
 
-import java.time.LocalDateTime;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import com.zoopi.domain.BaseEntity;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,22 +17,18 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "bans")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Ban {
+public class Ban extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ban_id")
 	private Long id;
 
-	@Column(name = "ban_phone")
+	@Column(name = "phone")
 	private String phone;
 
-	@Column(name = "ban_date")
-	private LocalDateTime bannedDate;
-
-	public Ban(String phone, LocalDateTime bannedDate) {
+	public Ban(String phone) {
 		this.phone = phone;
-		this.bannedDate = bannedDate;
 	}
 
 }
