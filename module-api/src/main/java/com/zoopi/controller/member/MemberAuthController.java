@@ -4,7 +4,6 @@ import static com.zoopi.controller.ResultCode.*;
 import static com.zoopi.domain.member.dto.SigninResponse.SigninResult.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -28,7 +27,6 @@ import com.zoopi.domain.authentication.dto.response.AuthenticationResult;
 import com.zoopi.domain.authentication.service.AuthenticationService;
 import com.zoopi.domain.authentication.service.BanService;
 import com.zoopi.domain.member.dto.SigninResponse;
-import com.zoopi.domain.member.entity.JoinType;
 import com.zoopi.domain.member.service.MemberService;
 import com.zoopi.util.AuthenticationCodeUtils;
 
@@ -53,19 +51,19 @@ public class MemberAuthController {
 
 	// TODO: @APiResponse 추가
 
-	@ApiOperation(value = "이메일 유효성 검사")
-	@ApiImplicitParam(name = "email", value = "이메일", required = true, example = "zoopi@gmail.com")
-	@PostMapping("/email/validate")
-	public ResponseEntity<ResultResponse> validateEmail(@RequestParam @Size(max = 30) @Email String email) {
-		final boolean isValidated = memberService.validateEmail(email);
+	@ApiOperation(value = "아이디 유효성 검사")
+	@ApiImplicitParam(name = "username", value = "아이디", required = true, example = "zoopi")
+	@PostMapping("/username/validate")
+	public ResponseEntity<ResultResponse> validateUsername(@RequestParam @Size(max = 30) String username) {
+		final boolean isValidated = memberService.validateUsername(username);
 		final ResultCode resultCode;
 		if (isValidated) {
-			resultCode = EMAIL_AVAILABLE;
+			resultCode = USERNAME_AVAILABLE;
 		} else {
-			resultCode = EMAIL_DUPLICATE;
+			resultCode = USERNAME_DUPLICATE;
 		}
 
-		final ValidationResponse response = new ValidationResponse(email, isValidated);
+		final ValidationResponse response = new ValidationResponse(username, isValidated);
 		return ResponseEntity.ok(ResultResponse.of(resultCode, response));
 	}
 
@@ -139,13 +137,13 @@ public class MemberAuthController {
 		return ResponseEntity.ok(ResultResponse.of(DELETE_ALL_EXPIRED_AUTHENTICATION_CODES));
 	}
 
-	@ApiOperation(value = "이메일 회원 가입")
-	@PostMapping("/signup/email")
-	public ResponseEntity<ResultResponse> signupByEmail(@Valid @RequestBody SignupRequest request) {
+	@ApiOperation(value = "일반 회원 가입")
+	@PostMapping("/signup")
+	public ResponseEntity<ResultResponse> signup(@Valid @RequestBody SignupRequest request) {
 		authenticationService.validatePassword(request.getPassword(), request.getPasswordCheck());
-		if (!memberService.validateEmail(request.getEmail())) {
-			final ValidationResponse response = new ValidationResponse(request.getEmail(), false);
-			return ResponseEntity.ok(ResultResponse.of(EMAIL_DUPLICATE, response));
+		if (!memberService.validateUsername(request.getUsername())) {
+			final ValidationResponse response = new ValidationResponse(request.getUsername(), false);
+			return ResponseEntity.ok(ResultResponse.of(USERNAME_DUPLICATE, response));
 		}
 		if (!memberService.validatePhone(request.getPhone())) {
 			final ValidationResponse response = new ValidationResponse(request.getPhone(), false);
@@ -162,16 +160,16 @@ public class MemberAuthController {
 			return ResponseEntity.ok(ResultResponse.of(AUTHENTICATION_KEY_NOT_AUTHENTICATED, response));
 		}
 
-		memberService.createMember(request.getEmail(), request.getPhone(), request.getName(), request.getPassword(), JoinType.EMAIL);
+		memberService.createMember(request.getUsername(), request.getPhone(), "", request.getPassword(), "");
 
 		return ResponseEntity.ok(ResultResponse.of(SIGN_UP_SUCCESS));
 	}
 
 	// TODO: RefreshToken -> Cookie 저장
-	@ApiOperation(value = "이메일 로그인")
-	@PostMapping("/signin/email")
+	@ApiOperation(value = "일반 로그인")
+	@PostMapping("/signin")
 	public ResponseEntity<ResultResponse> signinByEmail(@Valid @RequestBody SigninRequest request) {
-		final SigninResponse response = memberService.signin(request.getEmail(), request.getPassword());
+		final SigninResponse response = memberService.signin(request.getUsername(), request.getPassword());
 		final ResultCode resultCode;
 		if (response.getResult().equals(NONEXISTENT_USERNAME)) {
 			resultCode = MEMBER_USERNAME_NONEXISTENT;
