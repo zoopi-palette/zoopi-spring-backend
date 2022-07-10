@@ -1,9 +1,6 @@
 package com.zoopi.config.security.handler;
 
-import static com.zoopi.exception.response.ErrorCode.*;
-
 import java.io.OutputStream;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,23 +12,23 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zoopi.config.security.jwt.exception.JwtAuthenticationException;
+import com.zoopi.config.security.exception.CustomAuthenticationException;
 import com.zoopi.exception.response.ErrorResponse;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+	private final ObjectMapper objectMapper;
 
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 		AuthenticationException authException) {
-		final JwtAuthenticationException exception = (JwtAuthenticationException)authException;
-		final int status = AUTHENTICATION_FAILURE.getStatus();
-		final String code = AUTHENTICATION_FAILURE.getCode();
-		final String message = AUTHENTICATION_FAILURE.getMessage();
-		final List<ErrorResponse.FieldError> errors = exception.getErrors();
-		final ErrorResponse errorResponse = ErrorResponse.of(status, code, message, errors);
+		final CustomAuthenticationException exception = (CustomAuthenticationException)authException;
+		final ErrorResponse errorResponse = ErrorResponse.of(exception.getErrorCode(), exception.getErrors());
 
-		final ObjectMapper objectMapper = new ObjectMapper();
 		try (OutputStream os = response.getOutputStream()) {
 			objectMapper.writeValue(os, errorResponse);
 			os.flush();

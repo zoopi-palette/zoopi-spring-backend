@@ -1,8 +1,6 @@
 package com.zoopi.controller.member.request;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import lombok.AccessLevel;
@@ -17,10 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SigninRequest {
 
-	@NotNull
+	@NotBlank
 	@Size(max = 30)
-	@Email
-	private String email;
+	private String username;
 
 	@Size(max = 30)
 	@NotBlank

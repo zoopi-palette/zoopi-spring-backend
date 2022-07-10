@@ -1,6 +1,5 @@
 package com.zoopi.controller.member.request;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -18,10 +17,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SignupRequest {
 
-	@NotNull
+	@NotBlank
 	@Size(max = 30)
-	@Email
-	private String email;
+	private String username;
 
 	@NotNull
 	@Pattern(regexp = "^.*(?=^.{10,20}$)(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#$%^&*()+=]).*$")
@@ -34,10 +32,6 @@ public class SignupRequest {
 	@NotNull
 	@Pattern(regexp = "^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$")
 	private String phone;
-
-	@NotNull
-	@Pattern(regexp = "^[\\da-zA-Z가-힣]{1,10}$")
-	private String name;
 
 	@NotBlank
 	@Size(max = 36)

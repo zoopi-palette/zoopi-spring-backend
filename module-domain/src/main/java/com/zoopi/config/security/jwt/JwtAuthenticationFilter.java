@@ -22,17 +22,10 @@ import com.zoopi.util.JwtUtils;
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
 	private final JwtUtils jwtUtils;
-	private final RequestMatcher matcher;
 
 	public JwtAuthenticationFilter(RequestMatcher matcher, JwtUtils jwtUtils) {
-		super(ALL_PATTERN);
+		super(matcher);
 		this.jwtUtils = jwtUtils;
-		this.matcher = matcher;
-	}
-
-	@Override
-	protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
-		return matcher.matches(request);
 	}
 
 	@Override
@@ -54,14 +47,14 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 		Authentication authResult) throws IOException, ServletException {
 		SecurityContextHolder.getContext().setAuthentication(authResult);
-		super.successfulAuthentication(request, response, chain, authResult);
+		chain.doFilter(request, response);
 	}
 
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 		AuthenticationException failed) throws IOException, ServletException {
 		SecurityContextHolder.clearContext();
-		super.unsuccessfulAuthentication(request, response, failed);
+		super.getFailureHandler().onAuthenticationFailure(request, response, failed);
 	}
 
 }

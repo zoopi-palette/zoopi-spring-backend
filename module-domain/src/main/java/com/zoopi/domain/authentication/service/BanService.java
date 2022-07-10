@@ -29,7 +29,7 @@ public class BanService {
 			return false;
 		} else {
 			final Ban ban = banOptional.get();
-			if (now.isAfter(ban.getBannedDate().plusDays(BAN_DAY))) {
+			if (now.isAfter(ban.getCreatedAt().plusDays(BAN_DAY))) {
 				banRepository.delete(ban);
 				return false;
 			} else {
@@ -40,7 +40,7 @@ public class BanService {
 
 	@Transactional
 	public Ban banPhone(String phone) {
-		return banRepository.save(new Ban(phone, LocalDateTime.now()));
+		return banRepository.save(new Ban(phone));
 	}
 
 }

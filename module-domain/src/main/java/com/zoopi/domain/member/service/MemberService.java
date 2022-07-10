@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zoopi.domain.authentication.dto.JwtDto;
 import com.zoopi.domain.member.dto.SigninResponse;
-import com.zoopi.domain.member.entity.JoinType;
 import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.entity.AuthorityType;
 import com.zoopi.domain.member.entity.MemberAuthority;
@@ -31,8 +30,8 @@ public class MemberService {
 	private final MemberAuthorityRepository memberAuthorityRepository;
 	private final JwtUtils jwtUtils;
 
-	public boolean validateEmail(String email) {
-		return memberRepository.findByUsername(email).isEmpty();
+	public boolean validateUsername(String username) {
+		return memberRepository.findByUsername(username).isEmpty();
 	}
 
 	public boolean validatePhone(String phone) {
@@ -40,22 +39,22 @@ public class MemberService {
 	}
 
 	@Transactional
-	public Member createMember(String email, String phone, String name, String password, JoinType joinType) {
+	public Member createMember(String username, String phone, String name, String password, String email) {
 		final Member member = Member.builder()
-			.username(email)
+			.username(username)
 			.password(passwordEncoder.encode(password))
 			.name(name)
 			.phone(phone)
-			.joinType(joinType)
+			.email(email)
 			.build();
-		memberRepository.save(member);
 
-		saveMemberAuthority(member);
+		memberRepository.save(member);
+		addUserAuthority(member);
 
 		return member;
 	}
 
-	private void saveMemberAuthority(Member member) {
+	private void addUserAuthority(Member member) {
 		final MemberAuthority memberAuthority = MemberAuthority.builder()
 			.member(member)
 			.type(AuthorityType.ROLE_USER)
@@ -63,8 +62,8 @@ public class MemberService {
 		memberAuthorityRepository.save(memberAuthority);
 	}
 
-	public SigninResponse signin(String email, String password) {
-		final Optional<Member> memberOptional = memberRepository.findByUsername(email);
+	public SigninResponse signin(String username, String password) {
+		final Optional<Member> memberOptional = memberRepository.findByUsername(username);
 		if (memberOptional.isEmpty()) {
 			return new SigninResponse(new JwtDto("", ""), NONEXISTENT_USERNAME);
 		}

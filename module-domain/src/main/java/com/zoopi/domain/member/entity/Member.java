@@ -1,19 +1,13 @@
 package com.zoopi.domain.member.entity;
 
-import java.time.LocalDateTime;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import com.zoopi.domain.BaseEntity;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -26,42 +20,36 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Table(name = "members")
-@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "member_id")
 	private Long id;
 
-	@Column(name = "member_username", unique = true)
+	@Column(name = "username", unique = true)
 	private String username;
 
-	@Column(name = "member_password")
+	@Column(name = "password")
 	private String password;
 
-	@Column(name = "member_name")
+	@Column(name = "name")
 	private String name;
 
-	@Column(name = "member_phone", unique = true)
+	@Column(name = "email", unique = true)
+	private String email;
+
+	@Column(name = "phone", unique = true)
 	private String phone;
 
-	@CreatedDate
-	@Column(name = "member_create_date")
-	private LocalDateTime createdDate;
-
-	@Enumerated(EnumType.STRING)
-	@Column(name = "member_join_type")
-	private JoinType joinType;
-
 	@Builder
-	public Member(String username, String password, String name, String phone, JoinType joinType) {
+	public Member(String username, String password, String name, String phone, String email) {
 		this.username = username;
 		this.password = password;
 		this.name = name;
 		this.phone = phone;
-		this.joinType = joinType;
+		this.email = email;
 	}
 
 }

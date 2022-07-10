@@ -8,8 +8,8 @@ import lombok.Getter;
 public enum ResultCode {
 
 	// Member
-	EMAIL_AVAILABLE(200, "R-M001", "사용 가능한 이메일입니다."),
-	EMAIL_DUPLICATE(200, "R-M002", "이미 사용 중인 이메일입니다."),
+	USERNAME_AVAILABLE(200, "R-M001", "사용 가능한 아이디입니다."),
+	USERNAME_DUPLICATE(200, "R-M002", "이미 사용 중인 아이디입니다."),
 	PHONE_AVAILABLE(200, "R-M003", "사용 가능한 휴대폰 번호입니다."),
 	PHONE_DUPLICATE(200, "R-M004", "이미 사용 중인 휴대폰 번호입니다."),
 	SIGN_UP_SUCCESS(200, "R-M005", "회원 가입에 성공하였습니다."),
