@@ -36,6 +36,9 @@ public enum ErrorCode {
 	MEMBER_NOT_FOUND(400, "E-M001", "존재하지 않는 회원입니다"),
 	PASSWORD_MISMATCHED(400, "E-M002", "비밀번호와 비밀번호 확인이 일치하지 않습니다."),
 
+	// BloodPost
+	BLOODPOST_NOT_FOUND(400, "E-BP001", "존재하지 않는 헌혈 요청글입니다."),
+
 	;
 
 	private final int status;
