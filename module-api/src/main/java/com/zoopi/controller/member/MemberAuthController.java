@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.zoopi.controller.ResultCode;
 import com.zoopi.controller.ResultResponse;
+import com.zoopi.controller.member.mapper.SigninResponseMapper;
+import com.zoopi.controller.member.mapper.ValidationResponseMapper;
 import com.zoopi.controller.member.request.AuthenticationCodeCheckRequest;
 import com.zoopi.controller.member.request.SigninRequest;
 import com.zoopi.controller.member.request.SignupRequest;
-import com.zoopi.controller.member.response.ValidationResponse;
 import com.zoopi.domain.authentication.dto.response.AuthenticationResponse;
 import com.zoopi.domain.authentication.dto.response.AuthenticationResult;
 import com.zoopi.domain.authentication.service.AuthenticationService;
@@ -56,15 +56,8 @@ public class MemberAuthController {
 	@PostMapping("/username/validate")
 	public ResponseEntity<ResultResponse> validateUsername(@RequestParam @Size(max = 30) String username) {
 		final boolean isValidated = memberService.validateUsername(username);
-		final ResultCode resultCode;
-		if (isValidated) {
-			resultCode = USERNAME_AVAILABLE;
-		} else {
-			resultCode = USERNAME_DUPLICATE;
-		}
-
-		final ValidationResponse response = new ValidationResponse(username, isValidated);
-		return ResponseEntity.ok(ResultResponse.of(resultCode, response));
+		final ResultResponse response = ValidationResponseMapper.fromValidatingUsername(username, isValidated);
+		return ResponseEntity.ok(response);
 	}
 
 	@ApiOperation(value = "휴대폰 번호 유효성 검사")
@@ -73,15 +66,8 @@ public class MemberAuthController {
 	public ResponseEntity<ResultResponse> validatePhone(
 		@RequestParam @Pattern(regexp = "^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$") String phone) {
 		final boolean isValidated = memberService.validatePhone(phone);
-		final ResultCode resultCode;
-		if (isValidated) {
-			resultCode = PHONE_AVAILABLE;
-		} else {
-			resultCode = PHONE_DUPLICATE;
-		}
-
-		final ValidationResponse response = new ValidationResponse(phone, isValidated);
-		return ResponseEntity.ok(ResultResponse.of(resultCode, response));
+		final ResultResponse response = ValidationResponseMapper.fromValidatingPhone(phone, isValidated);
+		return ResponseEntity.ok(response);
 	}
 
 	// TODO: 비밀번호 찾기 API와 독립적으로 문자 전송 밴 처리
@@ -111,29 +97,15 @@ public class MemberAuthController {
 		@Valid @RequestBody AuthenticationCodeCheckRequest request) {
 		final AuthenticationResult result = authenticationService.checkAuthenticationCode(
 			request.getAuthenticationCode(), request.getPhone(), request.getAuthenticationKey());
-
-		final boolean isValidated;
-		final ResultCode resultCode;
-		if (result.equals(AuthenticationResult.EXPIRED)) {
-			resultCode = AUTHENTICATION_CODE_EXPIRED;
-			isValidated = false;
-		} else if (result.equals(AuthenticationResult.MISMATCHED)) {
-			resultCode = AUTHENTICATION_CODE_MISMATCHED;
-			isValidated = false;
-		} else {
-			resultCode = AUTHENTICATION_CODE_MATCHED;
-			isValidated = true;
-		}
-
-		final ValidationResponse response = new ValidationResponse(request.getPhone(), isValidated);
-		return ResponseEntity.ok(ResultResponse.of(resultCode, response));
+		final ResultResponse response = ValidationResponseMapper.fromCheckingAuthenticationCode(result,
+			request.getPhone());
+		return ResponseEntity.ok(response);
 	}
 
 	@ApiOperation(value = "만료된 인증 코드 제거")
 	@DeleteMapping("/code")
 	public ResponseEntity<ResultResponse> deleteExpiredAuthenticationCodes() {
 		authenticationService.deleteExpiredAuthenticationCodes();
-
 		return ResponseEntity.ok(ResultResponse.of(DELETE_ALL_EXPIRED_AUTHENTICATION_CODES));
 	}
 
@@ -142,44 +114,34 @@ public class MemberAuthController {
 	public ResponseEntity<ResultResponse> signup(@Valid @RequestBody SignupRequest request) {
 		authenticationService.validatePassword(request.getPassword(), request.getPasswordCheck());
 		if (!memberService.validateUsername(request.getUsername())) {
-			final ValidationResponse response = new ValidationResponse(request.getUsername(), false);
-			return ResponseEntity.ok(ResultResponse.of(USERNAME_DUPLICATE, response));
+			final ResultResponse response = ValidationResponseMapper.fromValidatingUsername(request.getUsername(),
+				false);
+			return ResponseEntity.ok(response);
 		}
 		if (!memberService.validatePhone(request.getPhone())) {
-			final ValidationResponse response = new ValidationResponse(request.getPhone(), false);
-			return ResponseEntity.ok(ResultResponse.of(PHONE_DUPLICATE, response));
+			final ResultResponse response = ValidationResponseMapper.fromValidatingPhone(request.getPhone(), false);
+			return ResponseEntity.ok(response);
 		}
 
 		final AuthenticationResult result = authenticationService.validateAuthenticationKey(request.getPhone(),
 			request.getAuthenticationKey());
-		if (result.equals(AuthenticationResult.EXPIRED)) {
-			final ValidationResponse response = new ValidationResponse(request.getPhone(), false);
-			return ResponseEntity.ok(ResultResponse.of(AUTHENTICATION_KEY_EXPIRED, response));
-		} else if (result.equals(AuthenticationResult.NOT_AUTHENTICATED)) {
-			final ValidationResponse response = new ValidationResponse(request.getPhone(), false);
-			return ResponseEntity.ok(ResultResponse.of(AUTHENTICATION_KEY_NOT_AUTHENTICATED, response));
+		final ResultResponse response = ValidationResponseMapper.fromValidatingAuthenticationKey(result,
+			request.getPhone());
+
+		if (response.getCode().equals(SIGN_UP_SUCCESS.getCode())) {
+			memberService.createMember(request.getUsername(), request.getPhone(), "", request.getPassword(), "");
 		}
 
-		memberService.createMember(request.getUsername(), request.getPhone(), "", request.getPassword(), "");
-
-		return ResponseEntity.ok(ResultResponse.of(SIGN_UP_SUCCESS));
+		return ResponseEntity.ok(response);
 	}
 
 	// TODO: RefreshToken -> Cookie 저장
 	@ApiOperation(value = "일반 로그인")
 	@PostMapping("/signin")
-	public ResponseEntity<ResultResponse> signinByEmail(@Valid @RequestBody SigninRequest request) {
-		final SigninResponse response = memberService.signin(request.getUsername(), request.getPassword());
-		final ResultCode resultCode;
-		if (response.getResult().equals(NONEXISTENT_USERNAME)) {
-			resultCode = MEMBER_USERNAME_NONEXISTENT;
-		} else if(response.getResult().equals(MISMATCHED_PASSWORD)) {
-			resultCode = MEMBER_PASSWORD_MISMATCHED;
-		} else {
-			resultCode = SIGN_IN_SUCCESS;
-		}
-
-		return ResponseEntity.ok(ResultResponse.of(resultCode, response.getJwt()));
+	public ResponseEntity<ResultResponse> signin(@Valid @RequestBody SigninRequest request) {
+		final SigninResponse result = memberService.signin(request.getUsername(), request.getPassword());
+		final ResultResponse response = SigninResponseMapper.fromSigningIn(result);
+		return ResponseEntity.ok(response);
 	}
 
 }
