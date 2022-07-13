@@ -30,11 +30,11 @@ public class MemberService {
 	private final MemberAuthorityRepository memberAuthorityRepository;
 	private final JwtUtils jwtUtils;
 
-	public boolean validateUsername(String username) {
+	public boolean isAvailableUsername(String username) {
 		return memberRepository.findByUsername(username).isEmpty();
 	}
 
-	public boolean validatePhone(String phone) {
+	public boolean isAvailablePhone(String phone) {
 		return memberRepository.findByPhone(phone).isEmpty();
 	}
 

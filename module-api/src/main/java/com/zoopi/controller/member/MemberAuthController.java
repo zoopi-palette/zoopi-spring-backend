@@ -1,7 +1,6 @@
 package com.zoopi.controller.member;
 
 import static com.zoopi.controller.ResultCode.*;
-import static com.zoopi.domain.member.dto.SigninResponse.SigninResult.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
@@ -9,7 +8,6 @@ import javax.validation.constraints.Size;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,8 +53,8 @@ public class MemberAuthController {
 	@ApiImplicitParam(name = "username", value = "아이디", required = true, example = "zoopi")
 	@PostMapping("/username/validate")
 	public ResponseEntity<ResultResponse> validateUsername(@RequestParam @Size(max = 30) String username) {
-		final boolean isValidated = memberService.validateUsername(username);
-		final ResultResponse response = ValidationResponseMapper.fromValidatingUsername(username, isValidated);
+		final boolean isAvailable = memberService.isAvailableUsername(username);
+		final ResultResponse response = ValidationResponseMapper.fromValidatingUsername(username, isAvailable);
 		return ResponseEntity.ok(response);
 	}
 
@@ -65,8 +63,8 @@ public class MemberAuthController {
 	@PostMapping("/phone/validate")
 	public ResponseEntity<ResultResponse> validatePhone(
 		@RequestParam @Pattern(regexp = "^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$") String phone) {
-		final boolean isValidated = memberService.validatePhone(phone);
-		final ResultResponse response = ValidationResponseMapper.fromValidatingPhone(phone, isValidated);
+		final boolean isAvailable = memberService.isAvailablePhone(phone);
+		final ResultResponse response = ValidationResponseMapper.fromValidatingPhone(phone, isAvailable);
 		return ResponseEntity.ok(response);
 	}
 
@@ -83,11 +81,12 @@ public class MemberAuthController {
 		final String authenticationCode = AuthenticationCodeUtils.generateRandomAuthenticationCode(
 			AUTHENTICATION_CODE_LENGTH);
 		authenticationService.sendAuthenticationCode(phone, authenticationCode);
+
 		final AuthenticationResponse response = authenticationService.createAuthentication(phone, authenticationCode);
 		if (authenticationService.getCountOfAuthentication(phone) >= MAX_SEND_COUNT) {
 			banService.banPhone(phone);
 		}
-
+		authenticationService.deleteExpiredAuthenticationCodes();
 		return ResponseEntity.ok(ResultResponse.of(SEND_AUTHENTICATION_CODE_SUCCESS, response));
 	}
 
@@ -102,23 +101,16 @@ public class MemberAuthController {
 		return ResponseEntity.ok(response);
 	}
 
-	@ApiOperation(value = "만료된 인증 코드 제거")
-	@DeleteMapping("/code")
-	public ResponseEntity<ResultResponse> deleteExpiredAuthenticationCodes() {
-		authenticationService.deleteExpiredAuthenticationCodes();
-		return ResponseEntity.ok(ResultResponse.of(DELETE_ALL_EXPIRED_AUTHENTICATION_CODES));
-	}
-
 	@ApiOperation(value = "일반 회원 가입")
 	@PostMapping("/signup")
 	public ResponseEntity<ResultResponse> signup(@Valid @RequestBody SignupRequest request) {
 		authenticationService.validatePassword(request.getPassword(), request.getPasswordCheck());
-		if (!memberService.validateUsername(request.getUsername())) {
+		if (!memberService.isAvailableUsername(request.getUsername())) {
 			final ResultResponse response = ValidationResponseMapper.fromValidatingUsername(request.getUsername(),
 				false);
 			return ResponseEntity.ok(response);
 		}
-		if (!memberService.validatePhone(request.getPhone())) {
+		if (!memberService.isAvailablePhone(request.getPhone())) {
 			final ResultResponse response = ValidationResponseMapper.fromValidatingPhone(request.getPhone(), false);
 			return ResponseEntity.ok(response);
 		}
@@ -135,7 +127,8 @@ public class MemberAuthController {
 		return ResponseEntity.ok(response);
 	}
 
-	// TODO: RefreshToken -> Cookie 저장
+	// TODO: 운영서버 - RefreshToken -> Cookie 전달
+	// 	Security filter 단으로 이동
 	@ApiOperation(value = "일반 로그인")
 	@PostMapping("/signin")
 	public ResponseEntity<ResultResponse> signin(@Valid @RequestBody SigninRequest request) {

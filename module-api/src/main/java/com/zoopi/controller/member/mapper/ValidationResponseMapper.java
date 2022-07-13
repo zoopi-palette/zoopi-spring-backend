@@ -9,15 +9,15 @@ import com.zoopi.domain.authentication.dto.response.AuthenticationResult;
 
 public class ValidationResponseMapper {
 
-	public static ResultResponse fromValidatingUsername(String username, boolean isValidated) {
-		final ResultCode resultCode = isValidated ? USERNAME_AVAILABLE : USERNAME_DUPLICATE;
-		final ValidationResponse response = ValidationResponse.of(username, isValidated);
+	public static ResultResponse fromValidatingUsername(String username, boolean isAvailable) {
+		final ResultCode resultCode = isAvailable ? USERNAME_AVAILABLE : USERNAME_DUPLICATE;
+		final ValidationResponse response = ValidationResponse.of(username, isAvailable);
 		return ResultResponse.of(resultCode, response);
 	}
 
-	public static ResultResponse fromValidatingPhone(String phone, boolean isValidated) {
-		final ResultCode resultCode = isValidated ? PHONE_AVAILABLE : PHONE_DUPLICATE;
-		final ValidationResponse response = ValidationResponse.of(phone, isValidated);
+	public static ResultResponse fromValidatingPhone(String phone, boolean isAvailable) {
+		final ResultCode resultCode = isAvailable ? PHONE_AVAILABLE : PHONE_DUPLICATE;
+		final ValidationResponse response = ValidationResponse.of(phone, isAvailable);
 		return ResultResponse.of(resultCode, response);
 	}
 
