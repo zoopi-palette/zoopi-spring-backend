@@ -50,7 +50,7 @@ public class AuthenticationService {
 	}
 
 	public int getCountOfAuthentication(String phone) {
-		return authenticationRepository.countByPhoneAndCreatedDateAfter(phone,
+		return authenticationRepository.countByPhoneAndCreatedAtAfter(phone,
 			LocalDateTime.now().minusMinutes(AUTHENTICATION_CODE_VALID_MINUTES));
 	}
 
@@ -85,9 +85,9 @@ public class AuthenticationService {
 	@Transactional
 	public boolean deleteExpiredAuthenticationCodes() {
 		final LocalDateTime now = LocalDateTime.now();
-		final List<Authentication> authentications = authenticationRepository.findAllByStatusAndCreatedDateAfter(
+		final List<Authentication> authentications = authenticationRepository.findAllByStatusAndCreatedAtAfter(
 			AuthenticationStatus.NOT_AUTHENTICATED, now.minusMinutes(AUTHENTICATION_CODE_VALID_MINUTES));
-		authentications.addAll(authenticationRepository.findAllByStatusAndCreatedDateAfter(
+		authentications.addAll(authenticationRepository.findAllByStatusAndCreatedAtAfter(
 			AuthenticationStatus.AUTHENTICATED, now.minusMinutes(AUTHENTICATION_KEY_VALID_MINUTES)));
 		authenticationRepository.deleteAllInBatch(authentications);
 		return true;

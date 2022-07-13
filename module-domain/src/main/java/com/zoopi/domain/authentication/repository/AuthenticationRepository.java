@@ -10,8 +10,8 @@ import com.zoopi.domain.authentication.entity.AuthenticationStatus;
 
 public interface AuthenticationRepository extends JpaRepository<Authentication, String> {
 
-	List<Authentication> findAllByStatusAndCreatedDateAfter(AuthenticationStatus status, LocalDateTime date);
+	List<Authentication> findAllByStatusAndCreatedAtAfter(AuthenticationStatus status, LocalDateTime date);
 
-	int countByPhoneAndCreatedDateAfter(String phone, LocalDateTime date);
+	int countByPhoneAndCreatedAtAfter(String phone, LocalDateTime date);
 
 }
