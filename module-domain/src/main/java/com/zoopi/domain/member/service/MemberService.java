@@ -1,8 +1,9 @@
 package com.zoopi.domain.member.service;
 
 import static com.zoopi.domain.member.dto.SigninResponse.SigninResult.*;
+import static com.zoopi.domain.member.entity.MemberAuthorityTypes.*;
+import static com.zoopi.util.Constants.*;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,10 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zoopi.domain.authentication.dto.JwtDto;
 import com.zoopi.domain.member.dto.SigninResponse;
 import com.zoopi.domain.member.entity.Member;
-import com.zoopi.domain.member.entity.AuthorityType;
-import com.zoopi.domain.member.entity.MemberAuthority;
 import com.zoopi.domain.member.repository.MemberRepository;
-import com.zoopi.domain.member.repository.MemberAuthorityRepository;
 import com.zoopi.util.JwtUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -27,7 +25,6 @@ public class MemberService {
 
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
-	private final MemberAuthorityRepository memberAuthorityRepository;
 	private final JwtUtils jwtUtils;
 
 	public boolean isAvailableUsername(String username) {
@@ -49,41 +46,31 @@ public class MemberService {
 			.build();
 
 		memberRepository.save(member);
-		addUserAuthority(member);
+		member.addAuthority(ROLE_USER);
 
 		return member;
-	}
-
-	private void addUserAuthority(Member member) {
-		final MemberAuthority memberAuthority = MemberAuthority.builder()
-			.member(member)
-			.type(AuthorityType.ROLE_USER)
-			.build();
-		memberAuthorityRepository.save(memberAuthority);
 	}
 
 	public SigninResponse signin(String username, String password) {
 		final Optional<Member> memberOptional = memberRepository.findByUsername(username);
 		if (memberOptional.isEmpty()) {
-			return new SigninResponse(new JwtDto("", ""), NONEXISTENT_USERNAME);
+			return new SigninResponse(new JwtDto(EMPTY, EMPTY), NONEXISTENT_USERNAME);
 		}
 		final Member member = memberOptional.get();
 
 		final boolean isMatchedPassword = passwordEncoder.matches(password, member.getPassword());
 		if (!isMatchedPassword) {
-			return new SigninResponse(new JwtDto("", ""), MISMATCHED_PASSWORD);
+			return new SigninResponse(new JwtDto(EMPTY, EMPTY), MISMATCHED_PASSWORD);
 		}
 
-		final List<MemberAuthority> authorities = memberAuthorityRepository.findAllByMember(member);
-		final JwtDto jwt = generateJwt(member, authorities);
+		final JwtDto jwt = generateJwt(member);
 
 		return new SigninResponse(jwt, SUCCESS);
 	}
 
-	private JwtDto generateJwt(Member member, List<MemberAuthority> authorities) {
-		final String accessToken = jwtUtils.generateJwt(member, authorities, JwtUtils.JwtType.ACCESS_TOKEN);
-		final String refreshToken = jwtUtils.generateJwt(member, authorities, JwtUtils.JwtType.REFRESH_TOKEN);
-
+	private JwtDto generateJwt(Member member) {
+		final String accessToken = jwtUtils.generateAccessToken(member);
+		final String refreshToken = jwtUtils.generateRefreshToken(member);
 		return new JwtDto(accessToken, refreshToken);
 	}
 
