@@ -34,7 +34,7 @@ public class SignupRequest {
 	private String phone;
 
 	@NotBlank
-	@Size(max = 36)
+	@Size(max = 50)
 	private String authenticationKey;
 
 }
