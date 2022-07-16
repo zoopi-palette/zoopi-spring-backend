@@ -12,6 +12,7 @@ import com.zoopi.domain.authentication.dto.response.AuthenticationResponse;
 import com.zoopi.domain.authentication.dto.response.AuthenticationResult;
 import com.zoopi.domain.authentication.entity.Authentication;
 import com.zoopi.domain.authentication.entity.AuthenticationStatus;
+import com.zoopi.domain.authentication.entity.AuthenticationType;
 import com.zoopi.domain.authentication.exception.PasswordMismatchException;
 import com.zoopi.domain.authentication.repository.AuthenticationRepository;
 import com.zoopi.infra.sms.SmsClient;
@@ -35,22 +36,23 @@ public class AuthenticationService {
 	}
 
 	@Transactional
-	public AuthenticationResponse createAuthentication(String phone, String authenticationCode) {
+	public AuthenticationResponse createAuthentication(String phone, String authenticationCode,
+		AuthenticationType type) {
 		String uuid = UUID.randomUUID().toString();
 		while (authenticationRepository.findById(uuid).isPresent()) {
 			uuid = UUID.randomUUID().toString();
 		}
 
 		final Authentication authentication = authenticationRepository.save(
-			new Authentication(uuid, authenticationCode, phone));
+			new Authentication(uuid, authenticationCode, phone, type));
 
 		final LocalDateTime expiredDate = authentication.getCreatedAt()
 			.plusMinutes(AUTHENTICATION_CODE_VALID_MINUTES);
 		return new AuthenticationResponse(uuid, expiredDate);
 	}
 
-	public int getCountOfAuthentication(String phone) {
-		return authenticationRepository.countByPhoneAndCreatedAtAfter(phone,
+	public int getCountOfAuthentication(String phone, AuthenticationType type) {
+		return authenticationRepository.countByPhoneAndTypeAndCreatedAtAfter(phone, type,
 			LocalDateTime.now().minusMinutes(AUTHENTICATION_CODE_VALID_MINUTES));
 	}
 
@@ -100,9 +102,11 @@ public class AuthenticationService {
 		return true;
 	}
 
-	public AuthenticationResult validateAuthenticationKey(String phone, String authenticationKey) {
+	public AuthenticationResult validateAuthenticationKey(String phone, String authenticationKey,
+		AuthenticationType type) {
 		final LocalDateTime now = LocalDateTime.now();
-		final Optional<Authentication> authenticationOptional = authenticationRepository.findById(authenticationKey);
+		final Optional<Authentication> authenticationOptional = authenticationRepository.findByIdAndType(
+			authenticationKey, type);
 
 		if (authenticationOptional.isEmpty()) {
 			return AuthenticationResult.EXPIRED;

@@ -6,7 +6,7 @@ import com.zoopi.exception.response.ErrorCode;
 public class PasswordMismatchException extends BusinessException {
 
 	public PasswordMismatchException() {
-		super(ErrorCode.PASSWORD_MISMATCHED);
+		super(ErrorCode.PASSWORD_INPUT_MISMATCHED);
 	}
 
 }

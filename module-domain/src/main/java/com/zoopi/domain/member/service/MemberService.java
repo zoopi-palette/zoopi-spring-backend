@@ -2,6 +2,7 @@ package com.zoopi.domain.member.service;
 
 import static com.zoopi.domain.member.dto.SigninResponse.SigninResult.*;
 import static com.zoopi.domain.member.entity.MemberAuthorityTypes.*;
+import static com.zoopi.exception.response.ErrorCode.*;
 import static com.zoopi.util.Constants.*;
 
 import java.util.Optional;
@@ -14,6 +15,7 @@ import com.zoopi.domain.authentication.dto.JwtDto;
 import com.zoopi.domain.member.dto.SigninResponse;
 import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.repository.MemberRepository;
+import com.zoopi.exception.EntityNotFoundException;
 import com.zoopi.util.JwtUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -74,4 +76,17 @@ public class MemberService {
 		return new JwtDto(accessToken, refreshToken);
 	}
 
+	public String getUsernameByPhone(String phone) {
+		final Member member = memberRepository.findByPhone(phone)
+			.orElseThrow(() -> new EntityNotFoundException(MEMBER_NOT_FOUND));
+		return member.getUsername();
+	}
+
+	@Transactional
+	public boolean changePassword(String username, String password) {
+		final Member member = memberRepository.findByUsername(username)
+			.orElseThrow(() -> new EntityNotFoundException(MEMBER_NOT_FOUND));
+		member.changePassword(passwordEncoder.encode(password));
+		return true;
+	}
 }

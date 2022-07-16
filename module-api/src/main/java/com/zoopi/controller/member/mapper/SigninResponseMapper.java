@@ -10,9 +10,9 @@ public class SigninResponseMapper {
 	public static ResultResponse fromSigningIn(SigninResponse response) {
 		switch (response.getResult()) {
 			case NONEXISTENT_USERNAME:
-				return ResultResponse.of(MEMBER_USERNAME_NONEXISTENT, response.getJwt());
+				return ResultResponse.of(USERNAME_NONEXISTENT, response.getJwt());
 			case MISMATCHED_PASSWORD:
-				return ResultResponse.of(MEMBER_PASSWORD_MISMATCHED, response.getJwt());
+				return ResultResponse.of(PASSWORD_MISMATCHED, response.getJwt());
 			default:
 				return ResultResponse.of(SIGN_UP_SUCCESS, response.getJwt());
 		}
