@@ -33,10 +33,12 @@ public class FindPasswordRequest {
 
 	@NotNull
 	@Pattern(regexp = "^.*(?=^.{10,20}$)(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#$%^&*()+=]).*$")
+	@ApiModelProperty(value = "비밀번호", required = true, example = "1234asdf!@#$")
 	private String password;
 
 	@NotNull
 	@Pattern(regexp = "^.*(?=^.{10,20}$)(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#$%^&*()+=]).*$")
+	@ApiModelProperty(value = "비밀번호 확인", required = true, example = "1234asdf!@#$")
 	private String passwordCheck;
 
 }
