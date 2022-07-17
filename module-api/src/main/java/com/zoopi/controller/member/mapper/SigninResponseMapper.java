@@ -14,7 +14,7 @@ public class SigninResponseMapper {
 			case MISMATCHED_PASSWORD:
 				return ResultResponse.of(PASSWORD_MISMATCHED, response.getJwt());
 			default:
-				return ResultResponse.of(SIGN_UP_SUCCESS, response.getJwt());
+				return ResultResponse.of(SIGN_IN_SUCCESS, response.getJwt());
 		}
 	}
 

@@ -112,20 +112,20 @@ public class MemberAuthController {
 			request.getAuthenticationKey(), AuthenticationType.SIGN_UP);
 
 		authenticationService.validatePassword(request.getPassword(), request.getPasswordCheck());
+		ResultResponse response;
 		if (!memberService.isAvailableUsername(request.getUsername())) {
-			final ResultResponse response = ValidationResponseMapper.fromValidatingUsername(request.getUsername(),
-				false);
+			response = ValidationResponseMapper.fromValidatingUsername(request.getUsername(), false);
 			return ResponseEntity.ok(response);
 		}
 		if (!memberService.isAvailablePhone(request.getPhone())) {
-			final ResultResponse response = ValidationResponseMapper.fromValidatingPhone(request.getPhone(), false);
+			response = ValidationResponseMapper.fromValidatingPhone(request.getPhone(), false);
 			return ResponseEntity.ok(response);
 		}
 
-		final ResultResponse response = ValidationResponseMapper.fromCheckingAuthenticationCode(result,
-			request.getPhone());
-		if (response.getCode().equals(SIGN_UP_SUCCESS.getCode())) {
+		response = ValidationResponseMapper.fromCheckingAuthenticationCode(result, request.getPhone());
+		if (response.getCode().equals(AUTHENTICATION_CODE_MATCHED.getCode())) {
 			memberService.createMember(request.getUsername(), request.getPhone(), EMPTY, request.getPassword(), EMPTY);
+			response = ResultResponse.of(SIGN_UP_SUCCESS);
 		}
 
 		return ResponseEntity.ok(response);

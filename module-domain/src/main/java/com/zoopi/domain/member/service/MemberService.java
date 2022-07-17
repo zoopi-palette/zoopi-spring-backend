@@ -87,4 +87,5 @@ public class MemberService {
 		member.changePassword(passwordEncoder.encode(password));
 		return true;
 	}
+
 }
