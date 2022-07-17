@@ -17,8 +17,8 @@ public class SnsAccountService {
 
     private final SnsAccountRepository snsAccountRepository;
 
-    public Optional<SnsAccount> get(SnsAccountPrimaryKey primaryKey) {
-        return snsAccountRepository.findById(primaryKey);
+    public Optional<SnsAccount> getWithMember(SnsAccountPrimaryKey primaryKey) {
+        return snsAccountRepository.findWithMemberById(primaryKey);
     }
 
     @Transactional

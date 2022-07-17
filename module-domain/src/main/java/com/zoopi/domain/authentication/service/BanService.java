@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zoopi.domain.authentication.entity.AuthenticationType;
 import com.zoopi.domain.authentication.entity.Ban;
 import com.zoopi.domain.authentication.repository.BanRepository;
 
@@ -21,9 +22,9 @@ public class BanService {
 	private final long BAN_DAY = 1L;
 
 	@Transactional
-	public boolean isBannedPhone(String phone) {
+	public boolean isBanned(String phone, AuthenticationType type) {
 		final LocalDateTime now = LocalDateTime.now();
-		final Optional<Ban> banOptional = banRepository.findByPhone(phone);
+		final Optional<Ban> banOptional = banRepository.findByPhoneAndType(phone, type);
 
 		if (banOptional.isEmpty()) {
 			return false;
@@ -39,8 +40,8 @@ public class BanService {
 	}
 
 	@Transactional
-	public Ban banPhone(String phone) {
-		return banRepository.save(new Ban(phone));
+	public Ban ban(String phone, AuthenticationType type) {
+		return banRepository.save(new Ban(phone, type));
 	}
 
 }

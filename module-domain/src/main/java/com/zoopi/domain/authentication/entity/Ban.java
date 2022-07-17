@@ -2,6 +2,8 @@ package com.zoopi.domain.authentication.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,8 +29,13 @@ public class Ban extends BaseEntity {
 	@Column(name = "phone")
 	private String phone;
 
-	public Ban(String phone) {
+	@Enumerated(EnumType.STRING)
+	@Column(name = "type")
+	private AuthenticationType type;
+
+	public Ban(String phone, AuthenticationType type) {
 		this.phone = phone;
+		this.type = type;
 	}
 
 }

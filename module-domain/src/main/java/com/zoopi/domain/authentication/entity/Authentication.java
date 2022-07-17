@@ -33,11 +33,16 @@ public class Authentication extends BaseEntity {
 	@Column(name = "status")
 	private AuthenticationStatus status;
 
-	public Authentication(String id, String code, String phone) {
+	@Enumerated(EnumType.STRING)
+	@Column(name = "type")
+	private AuthenticationType type;
+
+	public Authentication(String id, String code, String phone, AuthenticationType type) {
 		this.id = id;
 		this.code = code;
 		this.phone = phone;
 		this.status = AuthenticationStatus.NOT_AUTHENTICATED;
+		this.type = type;
 	}
 
 	public void authenticate() {

@@ -9,13 +9,15 @@ public enum ResultCode {
 
 	// Member
 	USERNAME_AVAILABLE(200, "R-M001", "사용 가능한 아이디입니다."),
-	USERNAME_DUPLICATE(200, "R-M002", "이미 사용 중인 아이디입니다."),
+	USERNAME_EXISTENT(200, "R-M002", "존재하는 아이디입니다."),
 	PHONE_AVAILABLE(200, "R-M003", "사용 가능한 휴대폰 번호입니다."),
-	PHONE_DUPLICATE(200, "R-M004", "이미 사용 중인 휴대폰 번호입니다."),
+	PHONE_EXISTENT(200, "R-M004", "존재하는 휴대폰 번호입니다."),
 	SIGN_UP_SUCCESS(200, "R-M005", "회원 가입에 성공하였습니다."),
 	SIGN_IN_SUCCESS(200, "R-M006", "로그인에 성공하였습니다."),
-	MEMBER_PASSWORD_MISMATCHED(200, "R-M007", "회원 비밀번호가 일치하지 않습니다."),
-	MEMBER_USERNAME_NONEXISTENT(200, "R-M008", "회원 아이디가 올바르지 않습니다."),
+	PASSWORD_MISMATCHED(200, "R-M007", "회원 비밀번호가 일치하지 않습니다."),
+	USERNAME_NONEXISTENT(200, "R-M008", "회원 아이디가 올바르지 않습니다."),
+	FIND_USERNAME_SUCCESS(200, "R-M009", "회원 아이디 찾기에 성공하였습니다."),
+	PASSWORD_CHANGE_SUCCESS(200, "R-M010", "회원 비밀번호 변경에 성공하였습니다."),
 
 	// Authentication
 	AUTHENTICATION_CODE_EXPIRED(200, "R-A001", "만료된 인증 코드입니다."),

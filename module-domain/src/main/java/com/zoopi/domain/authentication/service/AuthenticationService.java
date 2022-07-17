@@ -1,6 +1,7 @@
 package com.zoopi.domain.authentication.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import com.zoopi.domain.authentication.dto.response.AuthenticationResponse;
 import com.zoopi.domain.authentication.dto.response.AuthenticationResult;
 import com.zoopi.domain.authentication.entity.Authentication;
 import com.zoopi.domain.authentication.entity.AuthenticationStatus;
+import com.zoopi.domain.authentication.entity.AuthenticationType;
 import com.zoopi.domain.authentication.exception.PasswordMismatchException;
 import com.zoopi.domain.authentication.repository.AuthenticationRepository;
 import com.zoopi.infra.sms.SmsClient;
@@ -35,22 +37,22 @@ public class AuthenticationService {
 	}
 
 	@Transactional
-	public AuthenticationResponse createAuthentication(String phone, String authenticationCode) {
+	public AuthenticationResponse createAuthentication(String phone, String authenticationCode,
+		AuthenticationType type) {
 		String uuid = UUID.randomUUID().toString();
 		while (authenticationRepository.findById(uuid).isPresent()) {
 			uuid = UUID.randomUUID().toString();
 		}
 
-		final Authentication authentication = authenticationRepository.save(
-			new Authentication(uuid, authenticationCode, phone));
-
-		final LocalDateTime expiredDate = authentication.getCreatedAt()
-			.plusMinutes(AUTHENTICATION_CODE_VALID_MINUTES);
+		authenticationRepository.save(new Authentication(uuid, authenticationCode, phone, type));
+		final String expiredDate = LocalDateTime.now()
+			.plusMinutes(AUTHENTICATION_CODE_VALID_MINUTES)
+			.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		return new AuthenticationResponse(uuid, expiredDate);
 	}
 
-	public int getCountOfAuthentication(String phone) {
-		return authenticationRepository.countByPhoneAndCreatedDateAfter(phone,
+	public int getCountOfAuthentication(String phone, AuthenticationType type) {
+		return authenticationRepository.countByPhoneAndTypeAndCreatedAtAfter(phone, type,
 			LocalDateTime.now().minusMinutes(AUTHENTICATION_CODE_VALID_MINUTES));
 	}
 
@@ -84,11 +86,9 @@ public class AuthenticationService {
 
 	@Transactional
 	public boolean deleteExpiredAuthenticationCodes() {
-		final LocalDateTime now = LocalDateTime.now();
-		final List<Authentication> authentications = authenticationRepository.findAllByStatusAndCreatedDateAfter(
-			AuthenticationStatus.NOT_AUTHENTICATED, now.minusMinutes(AUTHENTICATION_CODE_VALID_MINUTES));
-		authentications.addAll(authenticationRepository.findAllByStatusAndCreatedDateAfter(
-			AuthenticationStatus.AUTHENTICATED, now.minusMinutes(AUTHENTICATION_KEY_VALID_MINUTES)));
+		final LocalDateTime nowBeforeFiveMinutes = LocalDateTime.now().minusMinutes(AUTHENTICATION_CODE_VALID_MINUTES);
+		final List<Authentication> authentications = authenticationRepository.findAllByCreatedAtBefore(
+			nowBeforeFiveMinutes);
 		authenticationRepository.deleteAllInBatch(authentications);
 		return true;
 	}
@@ -100,9 +100,11 @@ public class AuthenticationService {
 		return true;
 	}
 
-	public AuthenticationResult validateAuthenticationKey(String phone, String authenticationKey) {
+	public AuthenticationResult validateAuthenticationKey(String phone, String authenticationKey,
+		AuthenticationType type) {
 		final LocalDateTime now = LocalDateTime.now();
-		final Optional<Authentication> authenticationOptional = authenticationRepository.findById(authenticationKey);
+		final Optional<Authentication> authenticationOptional = authenticationRepository.findByIdAndType(
+			authenticationKey, type);
 
 		if (authenticationOptional.isEmpty()) {
 			return AuthenticationResult.EXPIRED;
