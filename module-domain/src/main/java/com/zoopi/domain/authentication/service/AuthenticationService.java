@@ -1,6 +1,7 @@
 package com.zoopi.domain.authentication.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,11 +44,10 @@ public class AuthenticationService {
 			uuid = UUID.randomUUID().toString();
 		}
 
-		final Authentication authentication = authenticationRepository.save(
-			new Authentication(uuid, authenticationCode, phone, type));
-
-		final LocalDateTime expiredDate = authentication.getCreatedAt()
-			.plusMinutes(AUTHENTICATION_CODE_VALID_MINUTES);
+		authenticationRepository.save(new Authentication(uuid, authenticationCode, phone, type));
+		final String expiredDate = LocalDateTime.now()
+			.plusMinutes(AUTHENTICATION_CODE_VALID_MINUTES)
+			.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		return new AuthenticationResponse(uuid, expiredDate);
 	}
 
@@ -86,11 +86,9 @@ public class AuthenticationService {
 
 	@Transactional
 	public boolean deleteExpiredAuthenticationCodes() {
-		final LocalDateTime now = LocalDateTime.now();
-		final List<Authentication> authentications = authenticationRepository.findAllByStatusAndCreatedAtAfter(
-			AuthenticationStatus.NOT_AUTHENTICATED, now.minusMinutes(AUTHENTICATION_CODE_VALID_MINUTES));
-		authentications.addAll(authenticationRepository.findAllByStatusAndCreatedAtAfter(
-			AuthenticationStatus.AUTHENTICATED, now.minusMinutes(AUTHENTICATION_KEY_VALID_MINUTES)));
+		final LocalDateTime nowBeforeFiveMinutes = LocalDateTime.now().minusMinutes(AUTHENTICATION_CODE_VALID_MINUTES);
+		final List<Authentication> authentications = authenticationRepository.findAllByCreatedAtBefore(
+			nowBeforeFiveMinutes);
 		authenticationRepository.deleteAllInBatch(authentications);
 		return true;
 	}

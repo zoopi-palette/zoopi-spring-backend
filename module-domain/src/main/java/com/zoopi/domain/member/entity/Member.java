@@ -57,13 +57,17 @@ public class Member extends BaseEntity {
 		this.name = name;
 		this.phone = phone;
 		this.email = email;
+		this.authorities = MemberAuthorityTypes.ROLE_USER.name();
 	}
 
 	public boolean addAuthority(MemberAuthorityTypes authority) {
+		if (this.authorities.isEmpty()) {
+			return false;
+		}
+
 		final Set<MemberAuthorityTypes> authorityTypes = Arrays.stream(this.authorities.split(","))
 			.map(MemberAuthorityTypes::valueOf)
 			.collect(Collectors.toSet());
-
 		for (MemberAuthorityTypes authorityType : authorityTypes) {
 			if (authorityType.equals(authority)) {
 				return false;

@@ -7,12 +7,11 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.zoopi.domain.authentication.entity.Authentication;
-import com.zoopi.domain.authentication.entity.AuthenticationStatus;
 import com.zoopi.domain.authentication.entity.AuthenticationType;
 
 public interface AuthenticationRepository extends JpaRepository<Authentication, String> {
 
-	List<Authentication> findAllByStatusAndCreatedAtAfter(AuthenticationStatus status, LocalDateTime date);
+	List<Authentication> findAllByCreatedAtBefore(LocalDateTime date);
 
 	int countByPhoneAndTypeAndCreatedAtAfter(String phone, AuthenticationType type, LocalDateTime date);
 

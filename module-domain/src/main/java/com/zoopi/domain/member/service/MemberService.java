@@ -1,7 +1,6 @@
 package com.zoopi.domain.member.service;
 
 import static com.zoopi.domain.member.dto.SigninResponse.SigninResult.*;
-import static com.zoopi.domain.member.entity.MemberAuthorityTypes.*;
 import static com.zoopi.exception.response.ErrorCode.*;
 import static com.zoopi.util.Constants.*;
 
@@ -48,7 +47,6 @@ public class MemberService {
 			.build();
 
 		memberRepository.save(member);
-		member.addAuthority(ROLE_USER);
 
 		return member;
 	}
