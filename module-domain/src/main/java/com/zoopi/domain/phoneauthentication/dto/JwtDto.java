@@ -1,4 +1,4 @@
-package com.zoopi.domain.authentication.dto;
+package com.zoopi.domain.phoneauthentication.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.zoopi.domain.authentication.entity;
+package com.zoopi.domain.phoneauthentication.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,12 +15,12 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "authentications")
+@Table(name = "phone_authentications")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Authentication extends BaseEntity {
+public class PhoneAuthentication extends BaseEntity {
 
 	@Id
-	@Column(name = "authentication_id")
+	@Column(name = "phone_authentication_id")
 	private String id;
 
 	@Column(name = "code")
@@ -31,22 +31,22 @@ public class Authentication extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status")
-	private AuthenticationStatus status;
+	private PhoneAuthenticationStatus status;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type")
-	private AuthenticationType type;
+	private PhoneAuthenticationType type;
 
-	public Authentication(String id, String code, String phone, AuthenticationType type) {
+	public PhoneAuthentication(String id, String code, String phone, PhoneAuthenticationType type) {
 		this.id = id;
 		this.code = code;
 		this.phone = phone;
-		this.status = AuthenticationStatus.NOT_AUTHENTICATED;
+		this.status = PhoneAuthenticationStatus.NOT_AUTHENTICATED;
 		this.type = type;
 	}
 
 	public void authenticate() {
-		this.status = AuthenticationStatus.AUTHENTICATED;
+		this.status = PhoneAuthenticationStatus.AUTHENTICATED;
 	}
 
 }

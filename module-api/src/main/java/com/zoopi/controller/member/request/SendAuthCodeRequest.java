@@ -3,7 +3,7 @@ package com.zoopi.controller.member.request;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import com.zoopi.domain.authentication.entity.AuthenticationType;
+import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationType;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
@@ -18,7 +18,7 @@ public class SendAuthCodeRequest {
 
 	@NotNull
 	@ApiModelProperty(value = "인증 타입", required = true, example = "SIGN_UP")
-	private AuthenticationType type;
+	private PhoneAuthenticationType type;
 
 	@NotNull
 	@Pattern(regexp = "^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$")

@@ -1,4 +1,4 @@
-package com.zoopi.domain.authentication.entity;
+package com.zoopi.domain.phoneauthentication.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,13 +17,13 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "bans")
+@Table(name = "phone_authentication_bans")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Ban extends BaseEntity {
+public class PhoneAuthenticationBan extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ban_id")
+	@Column(name = "phone_authentication_ban_id")
 	private Long id;
 
 	@Column(name = "phone")
@@ -31,9 +31,9 @@ public class Ban extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type")
-	private AuthenticationType type;
+	private PhoneAuthenticationType type;
 
-	public Ban(String phone, AuthenticationType type) {
+	public PhoneAuthenticationBan(String phone, PhoneAuthenticationType type) {
 		this.phone = phone;
 		this.type = type;
 	}

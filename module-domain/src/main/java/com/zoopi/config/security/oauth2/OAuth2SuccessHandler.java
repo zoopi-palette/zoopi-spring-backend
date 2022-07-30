@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zoopi.domain.authentication.dto.JwtDto;
+import com.zoopi.domain.phoneauthentication.dto.JwtDto;
 import com.zoopi.util.JwtUtils;
 
 import lombok.AllArgsConstructor;

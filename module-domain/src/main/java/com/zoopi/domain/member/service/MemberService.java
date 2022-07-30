@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zoopi.domain.authentication.dto.JwtDto;
+import com.zoopi.domain.phoneauthentication.dto.JwtDto;
 import com.zoopi.domain.member.dto.SigninResponse;
 import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.repository.MemberRepository;

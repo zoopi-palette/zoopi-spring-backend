@@ -4,7 +4,7 @@ import static com.zoopi.controller.ResultCode.*;
 
 import com.zoopi.controller.ResultCode;
 import com.zoopi.controller.ResultResponse;
-import com.zoopi.domain.authentication.dto.response.AuthenticationResult;
+import com.zoopi.domain.phoneauthentication.dto.response.PhoneAuthenticationResult;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,7 +24,7 @@ public class ValidationResponseMapper {
 		return ResultResponse.of(resultCode, response);
 	}
 
-	public static ResultResponse fromCheckingAuthenticationCode(AuthenticationResult result, String value) {
+	public static ResultResponse fromCheckingAuthenticationCode(PhoneAuthenticationResult result, String value) {
 		switch (result) {
 			case EXPIRED:
 				return ResultResponse.of(AUTHENTICATION_CODE_EXPIRED, ValidationResponse.of(value, false));

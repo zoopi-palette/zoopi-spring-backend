@@ -1,11 +1,11 @@
-package com.zoopi.domain.authentication.dto.response;
+package com.zoopi.domain.phoneauthentication.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class AuthenticationResponse {
+public class PhoneAuthenticationResponse {
 
 	private String authenticationKey;
 
