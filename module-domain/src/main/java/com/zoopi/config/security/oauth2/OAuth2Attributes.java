@@ -5,27 +5,21 @@ import static com.zoopi.util.Constants.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.zoopi.config.security.oauth2.exception.UnsupportedPlatformSignInException;
-import com.zoopi.util.Constants;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import com.zoopi.config.security.oauth2.exception.UnsupportedPlatformSignInException;
+import com.zoopi.domain.member.entity.oauth2.SnsProvider;
+
 @Getter
 @Builder
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class OAuth2Attributes {
-
-	public static final String NAVER = "naver";
-
-	private static final String NAVER_RESPONSE = "response";
-	private static final String PROVIDER = "provider";
-	private static final String OAUTH2_ID = "id";
-	private static final String OAUTH2_KEY = "id";
-	private static final String PHONE = "phone";
-	private static final String MOBILE = "mobile";
-	private static final String EMAIL = "email";
 
 	private Map<String, Object> attributes;
 	private String provider;
@@ -33,36 +27,39 @@ public class OAuth2Attributes {
 	private String phone;
 	private String email;
 
-	public static OAuth2Attributes of(String provider, String attributeKey, Map<String, Object> attributes) {
-		if (provider.equals(NAVER)) {
-			return ofNaver(provider, attributeKey, attributes);
-		} else {
-			throw new UnsupportedPlatformSignInException();
+	public static OAuth2Attributes of(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
+		final String registrationId = userRequest.getClientRegistration().getRegistrationId();
+		for (SnsProvider snsProvider : SnsProvider.values()) {
+			if (snsProvider.getProvider().equals(registrationId)) {
+				return of(snsProvider, userRequest, oAuth2User.getAttributes());
+			}
 		}
+
+		throw new UnsupportedPlatformSignInException();
 	}
 
-	private static OAuth2Attributes ofNaver(String provider, String attributeKey, Map<String, Object> attributes) {
-		final Map<String, Object> response = (Map<String, Object>)attributes.get(NAVER_RESPONSE);
-
-		final String phone = response.containsKey(MOBILE) ? (String)response.get(MOBILE) : EMPTY;
-		final String email = response.containsKey(EMAIL) ? (String)response.get(EMAIL) : EMPTY;
+	private static OAuth2Attributes of(SnsProvider snsProvider, OAuth2UserRequest userRequest, Map<String, Object> attributes) {
+		final Map<String, Object> response = (Map<String, Object>)attributes.get(snsProvider.getResponse());
+		final String userNameAttributeName = userRequest.getClientRegistration()
+			.getProviderDetails()
+			.getUserInfoEndpoint()
+			.getUserNameAttributeName();
 		return OAuth2Attributes.builder()
-			.provider(provider)
-			.phone(phone)
-			.email(email)
+			.provider(snsProvider.getProvider())
+			.phone(response.containsKey(snsProvider.getPhone()) ? (String)response.get(snsProvider.getPhone()) : EMPTY)
+			.email(response.containsKey(snsProvider.getEmail()) ? (String)response.get(snsProvider.getEmail()) : EMPTY)
 			.attributes(response)
-			.attributeKey(attributeKey)
+			.attributeKey(userNameAttributeName)
 			.build();
 	}
 
 	public Map<String, Object> convertToMap() {
 		final Map<String, Object> map = new HashMap<>();
-		map.put(PROVIDER, provider);
-		map.put(OAUTH2_ID, attributeKey);
-		map.put(OAUTH2_KEY, attributeKey);
-		map.put(PHONE, phone);
-		map.put(EMAIL, email);
-
+		map.put("provider", this.provider);
+		map.put("id", this.attributeKey);
+		map.put("key", this.attributeKey);
+		map.put("phone", this.phone);
+		map.put("email", this.email);
 		return map;
 	}
 
