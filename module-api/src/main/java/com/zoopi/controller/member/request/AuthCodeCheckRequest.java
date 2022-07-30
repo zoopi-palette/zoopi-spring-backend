@@ -11,10 +11,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationType;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AuthCodeCheckRequest {
+
+	@NotNull
+	@ApiModelProperty(value = "인증 타입", required = true, example = "SIGN_UP")
+	private PhoneAuthenticationType type;
 
 	@NotBlank
 	@Size(max = 50)

@@ -1,13 +1,13 @@
 package com.zoopi.domain.phoneauthentication.service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 
 import com.zoopi.domain.phoneauthentication.dto.response.PhoneAuthenticationResponse;
 import com.zoopi.domain.phoneauthentication.dto.response.PhoneAuthenticationResult;
@@ -18,77 +18,69 @@ import com.zoopi.domain.phoneauthentication.exception.PasswordMismatchException;
 import com.zoopi.domain.phoneauthentication.repository.PhoneAuthenticationRepository;
 import com.zoopi.infra.sms.SmsClient;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PhoneAuthenticationService {
 
-	private static final long AUTHENTICATION_CODE_VALID_MINUTES = 5L;
-	private static final long AUTHENTICATION_KEY_VALID_MINUTES = 30L;
+	public static final long PHONE_AUTHENTICATION_CODE_VALID_MINUTES = 5L;
+	public static final long PHONE_AUTHENTICATION_KEY_VALID_MINUTES = 30L;
+	private static final String PHONE_AUTHENTICATION_CODE_PHRASE = "[zoopi] 인증번호 [%s]를 입력해 주세요.";
 
 	private final PhoneAuthenticationRepository phoneAuthenticationRepository;
 	private final SmsClient smsClient;
 
+	/**
+	 * Reference: <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html#syntax">Formatter</a>
+	 */
 	public boolean sendAuthenticationCode(String phone, String authenticationCode) {
-		final String content = "[zoopi] 인증번호 [" + authenticationCode + "]를 입력해 주세요.";
+		final String content = String.format(PHONE_AUTHENTICATION_CODE_PHRASE, authenticationCode);
 		return smsClient.sendSms(phone, content);
 	}
 
 	@Transactional
 	public PhoneAuthenticationResponse createAuthentication(String phone, String authenticationCode,
 		PhoneAuthenticationType type) {
-		String uuid = UUID.randomUUID().toString();
-		while (phoneAuthenticationRepository.findById(uuid).isPresent()) {
-			uuid = UUID.randomUUID().toString();
-		}
-
-		phoneAuthenticationRepository.save(new PhoneAuthentication(uuid, authenticationCode, phone, type));
-		final String expiredDate = LocalDateTime.now()
-			.plusMinutes(AUTHENTICATION_CODE_VALID_MINUTES)
-			.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		return new PhoneAuthenticationResponse(uuid, expiredDate);
+		final PhoneAuthentication phoneAuthentication = PhoneAuthentication.of(authenticationCode, phone, type);
+		phoneAuthenticationRepository.save(phoneAuthentication);
+		return PhoneAuthenticationResponse.of(phoneAuthentication);
 	}
 
 	public int getCountOfAuthentication(String phone, PhoneAuthenticationType type) {
 		return phoneAuthenticationRepository.countByPhoneAndTypeAndCreatedAtAfter(phone, type,
-			LocalDateTime.now().minusMinutes(AUTHENTICATION_CODE_VALID_MINUTES));
+			LocalDateTime.now().minusMinutes(PHONE_AUTHENTICATION_CODE_VALID_MINUTES));
 	}
 
 	@Transactional
-	public PhoneAuthenticationResult checkAuthenticationCode(String authenticationCode, String phone,
-		String authenticationKey) {
-		final LocalDateTime now = LocalDateTime.now();
-		final Optional<PhoneAuthentication> authenticationOptional = phoneAuthenticationRepository.findById(authenticationKey);
-
+	public PhoneAuthenticationResult checkAuthenticationCode(String key, String code, String phone,
+		PhoneAuthenticationType type) {
+		final Optional<PhoneAuthentication> authenticationOptional = phoneAuthenticationRepository
+			.findByIdAndTypeAndPhoneAndStatusNot(key, type, phone, PhoneAuthenticationStatus.EXPIRED);
 		if (authenticationOptional.isEmpty()) {
 			return PhoneAuthenticationResult.EXPIRED;
 		}
 
 		final PhoneAuthentication phoneAuthentication = authenticationOptional.get();
-		final boolean isExpired = phoneAuthentication.getCreatedAt()
-			.plusMinutes(AUTHENTICATION_CODE_VALID_MINUTES)
-			.isBefore(now);
-		final boolean isMatch = phoneAuthentication.getCode().equals(authenticationCode);
-		final boolean isMine = phoneAuthentication.getPhone().equals(phone);
+		return phoneAuthentication.check(code);
+	}
 
-		if (isExpired) {
-			phoneAuthenticationRepository.deleteById(authenticationKey);
+	public PhoneAuthenticationResult validateAuthentication(String key, String phone, PhoneAuthenticationType type) {
+		final Optional<PhoneAuthentication> authenticationOptional = phoneAuthenticationRepository
+			.findByIdAndTypeAndPhoneAndStatusNot(key, type, phone, PhoneAuthenticationStatus.EXPIRED);
+		if (authenticationOptional.isEmpty()) {
 			return PhoneAuthenticationResult.EXPIRED;
-		} else if (isMatch && isMine) {
-			phoneAuthentication.authenticate();
-			return PhoneAuthenticationResult.AUTHENTICATED;
-		} else {
-			return PhoneAuthenticationResult.MISMATCHED;
 		}
+
+		final PhoneAuthentication phoneAuthentication = authenticationOptional.get();
+		return phoneAuthentication.validate();
 	}
 
 	@Transactional
 	public boolean deleteExpiredAuthenticationCodes() {
-		final LocalDateTime nowBeforeFiveMinutes = LocalDateTime.now().minusMinutes(AUTHENTICATION_CODE_VALID_MINUTES);
-		final List<PhoneAuthentication> phoneAuthentications = phoneAuthenticationRepository.findAllByCreatedAtBefore(
-			nowBeforeFiveMinutes);
+		final LocalDateTime nowBeforeFiveMinutes = LocalDateTime.now()
+			.minusMinutes(PHONE_AUTHENTICATION_CODE_VALID_MINUTES);
+		final List<PhoneAuthentication> phoneAuthentications = phoneAuthenticationRepository
+			.findAllByCreatedAtBefore(nowBeforeFiveMinutes);
 		phoneAuthenticationRepository.deleteAllInBatch(phoneAuthentications);
 		return true;
 	}
@@ -98,34 +90,6 @@ public class PhoneAuthenticationService {
 			throw new PasswordMismatchException();
 		}
 		return true;
-	}
-
-	public PhoneAuthenticationResult validateAuthenticationKey(String phone, String authenticationKey,
-		PhoneAuthenticationType type) {
-		final LocalDateTime now = LocalDateTime.now();
-		final Optional<PhoneAuthentication> authenticationOptional = phoneAuthenticationRepository.findByIdAndType(
-			authenticationKey, type);
-
-		if (authenticationOptional.isEmpty()) {
-			return PhoneAuthenticationResult.EXPIRED;
-		}
-
-		final PhoneAuthentication phoneAuthentication = authenticationOptional.get();
-		final boolean isExpired = phoneAuthentication.getCreatedAt()
-			.plusMinutes(AUTHENTICATION_KEY_VALID_MINUTES)
-			.isBefore(now);
-		final boolean isMine = phoneAuthentication.getPhone().equals(phone);
-		final boolean isAuthenticated = phoneAuthentication.getStatus().equals(PhoneAuthenticationStatus.AUTHENTICATED);
-
-		if (isExpired) {
-			phoneAuthenticationRepository.deleteById(authenticationKey);
-			return PhoneAuthenticationResult.EXPIRED;
-		} else if (isAuthenticated && isMine) {
-			phoneAuthenticationRepository.deleteById(authenticationKey);
-			return PhoneAuthenticationResult.AUTHENTICATED;
-		} else {
-			return PhoneAuthenticationResult.NOT_AUTHENTICATED;
-		}
 	}
 
 }

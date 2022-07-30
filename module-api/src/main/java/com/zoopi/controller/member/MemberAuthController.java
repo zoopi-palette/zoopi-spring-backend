@@ -78,7 +78,9 @@ public class MemberAuthController {
 	@ApiOperation(value = "휴대폰 본인 인증 문자 전송")
 	@PostMapping("/phone/send")
 	public ResponseEntity<ResultResponse> sendAuthenticationCode(@Valid @RequestBody SendAuthCodeRequest request) {
+		// TODO: 만료 인증코드 삭제 -> batch로 변경
 		phoneAuthenticationService.deleteExpiredAuthenticationCodes();
+
 		if (phoneAuthenticationBanService.isBanned(request.getPhone(), request.getType())) {
 			return ResponseEntity.ok(ResultResponse.of(PHONE_BANNED));
 		}
@@ -99,7 +101,7 @@ public class MemberAuthController {
 	@PostMapping("/code/check")
 	public ResponseEntity<ResultResponse> checkAuthenticationCode(@Valid @RequestBody AuthCodeCheckRequest request) {
 		final PhoneAuthenticationResult result = phoneAuthenticationService.checkAuthenticationCode(
-			request.getAuthenticationCode(), request.getPhone(), request.getAuthenticationKey());
+			request.getAuthenticationKey(), request.getAuthenticationCode(), request.getPhone(), request.getType());
 		final ResultResponse response = ValidationResponseMapper.fromCheckingAuthenticationCode(result,
 			request.getPhone());
 		return ResponseEntity.ok(response);
@@ -108,8 +110,8 @@ public class MemberAuthController {
 	@ApiOperation(value = "일반 회원 가입")
 	@PostMapping("/signup")
 	public ResponseEntity<ResultResponse> signup(@Valid @RequestBody SignupRequest request) {
-		final PhoneAuthenticationResult result = phoneAuthenticationService.validateAuthenticationKey(request.getPhone(),
-			request.getAuthenticationKey(), PhoneAuthenticationType.SIGN_UP);
+		final PhoneAuthenticationResult result = phoneAuthenticationService
+			.validateAuthentication(request.getAuthenticationKey(), request.getPhone(), PhoneAuthenticationType.SIGN_UP);
 
 		phoneAuthenticationService.validatePassword(request.getPassword(), request.getPasswordCheck());
 		ResultResponse response;
@@ -144,7 +146,7 @@ public class MemberAuthController {
 	@ApiOperation(value = "아이디 찾기")
 	@PostMapping("/find/username")
 	public ResponseEntity<ResultResponse> findUsername(@Valid @RequestBody FindUsernameRequest request) {
-		final PhoneAuthenticationResult result = phoneAuthenticationService.validateAuthenticationKey(
+		final PhoneAuthenticationResult result = phoneAuthenticationService.validateAuthentication(
 			request.getPhone(), request.getAuthenticationKey(), PhoneAuthenticationType.FIND_ID);
 
 		ResultResponse response = ValidationResponseMapper.fromCheckingAuthenticationCode(result, request.getPhone());
@@ -159,7 +161,7 @@ public class MemberAuthController {
 	@ApiOperation(value = "비밀번호 찾기")
 	@PostMapping("/find/password")
 	public ResponseEntity<ResultResponse> findPassword(@Valid @RequestBody FindPasswordRequest request) {
-		final PhoneAuthenticationResult authResult = phoneAuthenticationService.validateAuthenticationKey(
+		final PhoneAuthenticationResult authResult = phoneAuthenticationService.validateAuthentication(
 			request.getPhone(), request.getAuthenticationKey(), PhoneAuthenticationType.FIND_PW);
 
 		ResultResponse response = ValidationResponseMapper.fromCheckingAuthenticationCode(authResult, request.getPhone());
