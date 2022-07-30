@@ -32,15 +32,13 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws
 		AuthenticationException {
 		final String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
-		final String jwt;
 		try {
-			jwt = jwtUtils.extractJwt(authorizationHeader);
+			final String jwt = jwtUtils.extractJwt(authorizationHeader);
+			final JwtAuthenticationToken authentication = JwtAuthenticationToken.of(jwt);
+			return super.getAuthenticationManager().authenticate(authentication);
 		} catch (InvalidRequestHeaderException e) {
 			throw new JwtAuthenticationException(e.getErrors());
 		}
-		final JwtAuthenticationToken authentication = JwtAuthenticationToken.of(jwt);
-
-		return super.getAuthenticationManager().authenticate(authentication);
 	}
 
 	@Override
