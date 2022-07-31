@@ -1,4 +1,4 @@
-package com.zoopi.domain.certification.entity;
+package com.zoopi.domain.hospital.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,14 +11,13 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BloodDonationDetail {
+public class Hospital {
 
 	@Id @GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "blood_dontation_detail_id")
+	@Column(name = "hospital_id")
 	private Long id;
 
-	private Long chatRoomId;
-
-	private String message;
+	private String name;
+	private String address;
 
 }

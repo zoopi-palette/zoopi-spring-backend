@@ -21,11 +21,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BloodDonationHistory extends BaseEntity {
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id @GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "blood_donation_history_id")
 	private Long id;
 
 	private Long petId;
+	private Long receiverPetId;
 
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "blood_donation_detail_id")
@@ -34,7 +35,7 @@ public class BloodDonationHistory extends BaseEntity {
 	@Column(name = "image")
 	private String imageUrl;
 
-	private String hospitalAddress;
+	private Long hospitalId;
 
 	private LocalDate bloodDonationAt;
 
