@@ -10,14 +10,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zoopi.domain.phoneauthentication.dto.JwtDto;
+import lombok.RequiredArgsConstructor;
+
 import com.zoopi.domain.member.dto.SigninResponse;
 import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.repository.MemberRepository;
+import com.zoopi.domain.phoneauthentication.dto.JwtDto;
 import com.zoopi.exception.EntityNotFoundException;
 import com.zoopi.util.JwtUtils;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional(readOnly = true)
@@ -56,22 +56,15 @@ public class MemberService {
 		if (memberOptional.isEmpty()) {
 			return new SigninResponse(new JwtDto(EMPTY, EMPTY), NONEXISTENT_USERNAME);
 		}
-		final Member member = memberOptional.get();
 
+		final Member member = memberOptional.get();
 		final boolean isMatchedPassword = passwordEncoder.matches(password, member.getPassword());
 		if (!isMatchedPassword) {
 			return new SigninResponse(new JwtDto(EMPTY, EMPTY), MISMATCHED_PASSWORD);
 		}
 
 		final JwtDto jwt = generateJwt(member);
-
 		return new SigninResponse(jwt, SUCCESS);
-	}
-
-	private JwtDto generateJwt(Member member) {
-		final String accessToken = jwtUtils.generateAccessToken(member);
-		final String refreshToken = jwtUtils.generateRefreshToken(member);
-		return new JwtDto(accessToken, refreshToken);
 	}
 
 	public String getUsernameByPhone(String phone) {
@@ -86,6 +79,12 @@ public class MemberService {
 			.orElseThrow(() -> new EntityNotFoundException(MEMBER_NOT_FOUND));
 		member.changePassword(passwordEncoder.encode(password));
 		return true;
+	}
+
+	private JwtDto generateJwt(Member member) {
+		final String accessToken = jwtUtils.generateAccessToken(member);
+		final String refreshToken = jwtUtils.generateRefreshToken(member);
+		return new JwtDto(accessToken, refreshToken);
 	}
 
 }
