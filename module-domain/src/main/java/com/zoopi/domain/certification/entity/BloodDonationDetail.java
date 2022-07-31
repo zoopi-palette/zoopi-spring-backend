@@ -6,12 +6,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.zoopi.domain.BaseEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BloodDonationDetail {
+public class BloodDonationDetail extends BaseEntity {
 
 	@Id @GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "blood_dontation_detail_id")
