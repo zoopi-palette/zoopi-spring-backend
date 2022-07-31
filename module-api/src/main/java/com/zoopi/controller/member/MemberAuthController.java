@@ -1,6 +1,7 @@
 package com.zoopi.controller.member;
 
 import static com.zoopi.controller.ResultCode.*;
+import static com.zoopi.controller.member.dto.MemberAuthDto.*;
 import static com.zoopi.util.Constants.*;
 
 import javax.validation.Valid;
@@ -15,30 +16,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.zoopi.controller.ResultResponse;
-import com.zoopi.controller.member.mapper.FindPasswordResponseMapper;
-import com.zoopi.controller.member.mapper.FindUsernameResponseMapper;
-import com.zoopi.controller.member.mapper.SigninResponseMapper;
-import com.zoopi.controller.member.mapper.ValidationResponseMapper;
-import com.zoopi.controller.member.request.AuthCodeCheckRequest;
-import com.zoopi.controller.member.request.FindPasswordRequest;
-import com.zoopi.controller.member.request.FindUsernameRequest;
-import com.zoopi.controller.member.request.SendAuthCodeRequest;
-import com.zoopi.controller.member.request.SigninRequest;
-import com.zoopi.controller.member.request.SignupRequest;
-import com.zoopi.domain.phoneauthentication.dto.response.PhoneAuthenticationResponse;
-import com.zoopi.domain.phoneauthentication.dto.response.PhoneAuthenticationResult;
-import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationType;
-import com.zoopi.domain.phoneauthentication.service.PhoneAuthenticationService;
-import com.zoopi.domain.phoneauthentication.service.PhoneAuthenticationBanService;
-import com.zoopi.domain.member.dto.SigninResponse;
-import com.zoopi.domain.member.service.MemberService;
-import com.zoopi.util.AuthenticationCodeUtils;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+
+import com.zoopi.controller.ResultResponse;
+import com.zoopi.domain.member.dto.SigninResponse;
+import com.zoopi.domain.member.service.MemberService;
+import com.zoopi.domain.phoneauthentication.dto.response.PhoneAuthenticationResponse;
+import com.zoopi.domain.phoneauthentication.dto.response.PhoneAuthenticationResult;
+import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationType;
+import com.zoopi.domain.phoneauthentication.service.PhoneAuthenticationBanService;
+import com.zoopi.domain.phoneauthentication.service.PhoneAuthenticationService;
+import com.zoopi.util.AuthenticationCodeUtils;
 
 @Api(tags = "회원 인증 API")
 @Validated
@@ -61,7 +52,7 @@ public class MemberAuthController {
 	@PostMapping("/username/validate")
 	public ResponseEntity<ResultResponse> validateUsername(@RequestParam @Size(max = 30) String username) {
 		final boolean isAvailable = memberService.isAvailableUsername(username);
-		final ResultResponse response = ValidationResponseMapper.fromValidatingUsername(username, isAvailable);
+		final ResultResponse response = ValidationResponse.fromValidatingUsername(username, isAvailable);
 		return ResponseEntity.ok(response);
 	}
 
@@ -71,7 +62,7 @@ public class MemberAuthController {
 	public ResponseEntity<ResultResponse> validatePhone(
 		@RequestParam @Pattern(regexp = "^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$") String phone) {
 		final boolean isAvailable = memberService.isAvailablePhone(phone);
-		final ResultResponse response = ValidationResponseMapper.fromValidatingPhone(phone, isAvailable);
+		final ResultResponse response = ValidationResponse.fromValidatingPhone(phone, isAvailable);
 		return ResponseEntity.ok(response);
 	}
 
@@ -79,7 +70,7 @@ public class MemberAuthController {
 	@PostMapping("/phone/send")
 	public ResponseEntity<ResultResponse> sendAuthenticationCode(@Valid @RequestBody SendAuthCodeRequest request) {
 		// TODO: 만료 인증코드 삭제 -> batch로 변경
-		phoneAuthenticationService.deleteExpiredAuthenticationCodes();
+		// phoneAuthenticationService.deleteExpiredAuthenticationCodes();
 
 		if (phoneAuthenticationBanService.isBanned(request.getPhone(), request.getType())) {
 			return ResponseEntity.ok(ResultResponse.of(PHONE_BANNED));
@@ -91,7 +82,8 @@ public class MemberAuthController {
 
 		final PhoneAuthenticationResponse response = phoneAuthenticationService.createAuthentication(request.getPhone(),
 			authenticationCode, request.getType());
-		if (phoneAuthenticationService.getCountOfAuthentication(request.getPhone(), request.getType()) >= MAX_SEND_COUNT) {
+		if (phoneAuthenticationService.getCountOfAuthentication(request.getPhone(), request.getType())
+			>= MAX_SEND_COUNT) {
 			phoneAuthenticationBanService.ban(request.getPhone(), request.getType());
 		}
 		return ResponseEntity.ok(ResultResponse.of(SEND_AUTHENTICATION_CODE_SUCCESS, response));
@@ -102,8 +94,7 @@ public class MemberAuthController {
 	public ResponseEntity<ResultResponse> checkAuthenticationCode(@Valid @RequestBody AuthCodeCheckRequest request) {
 		final PhoneAuthenticationResult result = phoneAuthenticationService.checkAuthenticationCode(
 			request.getAuthenticationKey(), request.getAuthenticationCode(), request.getPhone(), request.getType());
-		final ResultResponse response = ValidationResponseMapper.fromCheckingAuthenticationCode(result,
-			request.getPhone());
+		final ResultResponse response = ValidationResponse.fromCheckingAuthenticationCode(result, request.getPhone());
 		return ResponseEntity.ok(response);
 	}
 
@@ -111,20 +102,21 @@ public class MemberAuthController {
 	@PostMapping("/signup")
 	public ResponseEntity<ResultResponse> signup(@Valid @RequestBody SignupRequest request) {
 		final PhoneAuthenticationResult result = phoneAuthenticationService
-			.validateAuthentication(request.getAuthenticationKey(), request.getPhone(), PhoneAuthenticationType.SIGN_UP);
+			.validateAuthentication(request.getAuthenticationKey(), request.getPhone(),
+				PhoneAuthenticationType.SIGN_UP);
 
 		phoneAuthenticationService.validatePassword(request.getPassword(), request.getPasswordCheck());
 		ResultResponse response;
 		if (!memberService.isAvailableUsername(request.getUsername())) {
-			response = ValidationResponseMapper.fromValidatingUsername(request.getUsername(), false);
+			response = ValidationResponse.fromValidatingUsername(request.getUsername(), false);
 			return ResponseEntity.ok(response);
 		}
 		if (!memberService.isAvailablePhone(request.getPhone())) {
-			response = ValidationResponseMapper.fromValidatingPhone(request.getPhone(), false);
+			response = ValidationResponse.fromValidatingPhone(request.getPhone(), false);
 			return ResponseEntity.ok(response);
 		}
 
-		response = ValidationResponseMapper.fromCheckingAuthenticationCode(result, request.getPhone());
+		response = ValidationResponse.fromCheckingAuthenticationCode(result, request.getPhone());
 		if (response.getCode().equals(AUTHENTICATION_CODE_MATCHED.getCode())) {
 			memberService.createMember(request.getUsername(), request.getPhone(), EMPTY, request.getPassword(), EMPTY);
 			response = ResultResponse.of(SIGN_UP_SUCCESS);
@@ -149,10 +141,10 @@ public class MemberAuthController {
 		final PhoneAuthenticationResult result = phoneAuthenticationService.validateAuthentication(
 			request.getPhone(), request.getAuthenticationKey(), PhoneAuthenticationType.FIND_ID);
 
-		ResultResponse response = ValidationResponseMapper.fromCheckingAuthenticationCode(result, request.getPhone());
+		ResultResponse response = ValidationResponse.fromCheckingAuthenticationCode(result, request.getPhone());
 		if (response.getCode().equals(AUTHENTICATION_CODE_MATCHED.getCode())) {
 			final String username = memberService.getUsernameByPhone(request.getPhone());
-			response = FindUsernameResponseMapper.fromFindingUsername(username);
+			response = UsernameResponse.fromFindingUsername(username);
 		}
 
 		return ResponseEntity.ok(response);
@@ -164,10 +156,11 @@ public class MemberAuthController {
 		final PhoneAuthenticationResult authResult = phoneAuthenticationService.validateAuthentication(
 			request.getPhone(), request.getAuthenticationKey(), PhoneAuthenticationType.FIND_PW);
 
-		ResultResponse response = ValidationResponseMapper.fromCheckingAuthenticationCode(authResult, request.getPhone());
+		ResultResponse response = ValidationResponse.fromCheckingAuthenticationCode(authResult,
+			request.getPhone());
 		if (response.getCode().equals(AUTHENTICATION_CODE_MATCHED.getCode())) {
 			final boolean isExistentUsername = !memberService.isAvailableUsername(request.getUsername());
-			response = FindPasswordResponseMapper.fromCheckingUsername(isExistentUsername, request.getUsername());
+			response = ValidationResponse.fromCheckingUsername(isExistentUsername, request.getUsername());
 			if (response.getCode().equals(USERNAME_EXISTENT.getCode())) {
 				phoneAuthenticationService.validatePassword(request.getPassword(), request.getPasswordCheck());
 				memberService.changePassword(request.getUsername(), request.getPassword());
