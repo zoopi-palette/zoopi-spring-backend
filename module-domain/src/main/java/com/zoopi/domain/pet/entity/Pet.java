@@ -58,6 +58,10 @@ public class Pet extends BaseEntity {
 	@Column(name = "blood_donation_history")
 	private String bloodDonationHistory;
 
+	// TODO: 재검토 필요
+	@Column(name = "image_url")
+	private String imageUrl;
+
 	@Builder
 	public Pet(String name, PetTypes type, String kind, Integer monthOfBirth, BloodTypes bloodType, Gender gender,
 		String registerNumber, Boolean neuterFlag, Integer weight, String bloodDonationHistory) {
@@ -72,7 +76,5 @@ public class Pet extends BaseEntity {
 		this.weight = weight;
 		this.bloodDonationHistory = bloodDonationHistory;
 	}
-
-	// TODO: image 추가
 
 }
