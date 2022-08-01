@@ -5,7 +5,6 @@ import static com.zoopi.util.Constants.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -52,16 +51,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 	private Member loadMember(OAuth2UserRequest userRequest, OAuth2Attributes oAuth2Attributes) {
 		final SnsAccountPrimaryKey primaryKey = getSnsAccountPrimaryKey(userRequest);
-		final Optional<SnsAccount> snsAccountOptional = snsAccountService.getWithMember(primaryKey);
-
-		final boolean isFirstLogin = snsAccountOptional.isEmpty();
-		if (isFirstLogin) {
-			final String email = oAuth2Attributes.getEmail();
-			final String phone = oAuth2Attributes.getPhone();
-			return signup(primaryKey, email, phone);
-		} else {
-			return snsAccountOptional.get().getMember();
-		}
+		return snsAccountService.getWithMember(primaryKey)
+			.map(SnsAccount::getMember)
+			.orElse(signup(primaryKey, oAuth2Attributes.getEmail(), oAuth2Attributes.getPhone()));
 	}
 
 	private SnsAccountPrimaryKey getSnsAccountPrimaryKey(OAuth2UserRequest userRequest) {
