@@ -46,9 +46,7 @@ public class MemberService {
 			.email(email)
 			.build();
 
-		memberRepository.save(member);
-
-		return member;
+		return memberRepository.save(member);
 	}
 
 	public SigninResponse signin(String username, String password) {
