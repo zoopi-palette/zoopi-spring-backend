@@ -2,6 +2,7 @@ package com.zoopi.domain.member.entity.oauth2;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import java.util.Objects;
 
 @Getter
 @Embeddable
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SnsAccountPrimaryKey implements Serializable {

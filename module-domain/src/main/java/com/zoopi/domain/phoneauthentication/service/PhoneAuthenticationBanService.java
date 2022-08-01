@@ -39,6 +39,7 @@ public class PhoneAuthenticationBanService {
 		}
 	}
 
+	// TODO: 선행 호출 메소드 isBanned -> 이런 비즈니스 로직들은 하나의 로직으로 묶으면 어떨까? 퍼사드패턴?
 	@Transactional
 	public PhoneAuthenticationBan ban(String phone, PhoneAuthenticationType type) {
 		return phoneAuthenticationBanRepository.save(new PhoneAuthenticationBan(phone, type));

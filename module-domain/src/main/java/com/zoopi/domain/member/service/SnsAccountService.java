@@ -21,6 +21,8 @@ public class SnsAccountService {
         return snsAccountRepository.findWithMemberById(primaryKey);
     }
 
+    // TODO: 이미 연결된 소셜계정이 있는 경우 -> 예외 처리 + 테스트 코드 작성
+    //  서로 다른 소설 계정을 여러 개 연동하는 케이스 -> 테스트 코드 작성
     @Transactional
     public SnsAccount connect(Member member, SnsAccountPrimaryKey primaryKey) {
         return snsAccountRepository.save(new SnsAccount(primaryKey, member));

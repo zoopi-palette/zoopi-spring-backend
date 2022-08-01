@@ -42,8 +42,7 @@ public class PhoneAuthenticationService {
 	public PhoneAuthenticationResponse createAuthentication(String phone, String authenticationCode,
 		PhoneAuthenticationType type) {
 		final PhoneAuthentication phoneAuthentication = PhoneAuthentication.of(authenticationCode, phone, type);
-		phoneAuthenticationRepository.save(phoneAuthentication);
-		return PhoneAuthenticationResponse.of(phoneAuthentication);
+		return PhoneAuthenticationResponse.of(phoneAuthenticationRepository.save(phoneAuthentication));
 	}
 
 	public int getCountOfAuthentication(String phone, PhoneAuthenticationType type) {
@@ -80,7 +79,7 @@ public class PhoneAuthenticationService {
 		final LocalDateTime nowBeforeFiveMinutes = LocalDateTime.now()
 			.minusMinutes(PHONE_AUTHENTICATION_CODE_VALID_MINUTES);
 		final List<PhoneAuthentication> phoneAuthentications = phoneAuthenticationRepository
-			.findAllByCreatedAtBefore(nowBeforeFiveMinutes);
+			.findAllByCreatedAtBeforeOrStatus(nowBeforeFiveMinutes, PhoneAuthenticationStatus.EXPIRED);
 		phoneAuthenticationRepository.deleteAllInBatch(phoneAuthentications);
 		return true;
 	}

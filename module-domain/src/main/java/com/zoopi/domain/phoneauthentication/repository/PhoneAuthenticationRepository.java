@@ -12,11 +12,11 @@ import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationType;
 
 public interface PhoneAuthenticationRepository extends JpaRepository<PhoneAuthentication, String> {
 
-	List<PhoneAuthentication> findAllByCreatedAtBefore(LocalDateTime date);
+	List<PhoneAuthentication> findAllByCreatedAtBeforeOrStatus(LocalDateTime date, PhoneAuthenticationStatus status);
 
 	int countByPhoneAndTypeAndCreatedAtAfter(String phone, PhoneAuthenticationType type, LocalDateTime date);
 
-	Optional<PhoneAuthentication> findByIdAndTypeAndPhoneAndStatusNot(String authenticationKey, PhoneAuthenticationType type,
-		String phone, PhoneAuthenticationStatus status);
+	Optional<PhoneAuthentication> findByIdAndTypeAndPhoneAndStatusNot(String authenticationKey,
+		PhoneAuthenticationType type, String phone, PhoneAuthenticationStatus status);
 
 }
