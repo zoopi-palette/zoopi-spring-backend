@@ -73,8 +73,8 @@ public class PhoneAuthentication extends BaseEntity {
 	 * @param code 휴대폰 sms 문자로 받은 인증코드
 	 * @return 인증코드 확인결과
 	 */
-	public PhoneAuthenticationResult check(String code) {
-		final boolean isExpired = isExpired(PHONE_AUTHENTICATION_CODE_VALID_MINUTES);
+	public PhoneAuthenticationResult checkCode(String code) {
+		final boolean isExpired = this.isExpired(PHONE_AUTHENTICATION_CODE_VALID_MINUTES);
 		final boolean isMatch = this.getCode().equals(code);
 
 		if (isExpired) {
@@ -93,7 +93,7 @@ public class PhoneAuthentication extends BaseEntity {
 	 * @return 인증결과
 	 */
 	public PhoneAuthenticationResult validate() {
-		final boolean isExpired = isExpired(PHONE_AUTHENTICATION_KEY_VALID_MINUTES);
+		final boolean isExpired = this.isExpired(PHONE_AUTHENTICATION_KEY_VALID_MINUTES);
 		final boolean isAuthenticated = this.getStatus().equals(PhoneAuthenticationStatus.AUTHENTICATED);
 
 		if (isExpired) {

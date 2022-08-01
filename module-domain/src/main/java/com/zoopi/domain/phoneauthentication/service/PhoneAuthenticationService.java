@@ -60,7 +60,7 @@ public class PhoneAuthenticationService {
 		}
 
 		final PhoneAuthentication phoneAuthentication = authenticationOptional.get();
-		return phoneAuthentication.check(code);
+		return phoneAuthentication.checkCode(code);
 	}
 
 	public PhoneAuthenticationResult validateAuthentication(String key, String phone, PhoneAuthenticationType type) {
