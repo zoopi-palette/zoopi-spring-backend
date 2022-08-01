@@ -28,14 +28,12 @@ public class OAuth2Attributes {
 	private String email;
 
 	public static OAuth2Attributes of(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
-		final String registrationId = userRequest.getClientRegistration().getRegistrationId();
-		for (SnsProvider snsProvider : SnsProvider.values()) {
-			if (snsProvider.getProvider().equals(registrationId)) {
-				return of(snsProvider, userRequest, oAuth2User.getAttributes());
-			}
+		try {
+			final String registrationId = userRequest.getClientRegistration().getRegistrationId();
+			return of(SnsProvider.valueOf(registrationId), userRequest, oAuth2User.getAttributes());
+		} catch (Exception e) {
+			throw new UnsupportedPlatformSignInException();
 		}
-
-		throw new UnsupportedPlatformSignInException();
 	}
 
 	private static OAuth2Attributes of(SnsProvider snsProvider, OAuth2UserRequest userRequest, Map<String, Object> attributes) {
