@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 public class ThanksMessage extends BaseEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "thanks_message_id")
 	private Long id;
 

@@ -11,7 +11,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 enum MessageType {
+
 	GENERAL
+
 }
 
 @Entity
@@ -19,7 +21,7 @@ enum MessageType {
 public class ChatMessage extends BaseEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "chat_message_id")
 	private Long id;
 
