@@ -1,20 +1,25 @@
 package com.zoopi.config.security.oauth2;
 
+import static com.zoopi.util.Constants.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import com.zoopi.config.security.oauth2.exception.UnsupportedPlatformSignInException;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import com.zoopi.config.security.oauth2.exception.UnsupportedPlatformSignInException;
+import com.zoopi.domain.member.entity.oauth2.SnsProvider;
+
 @Getter
 @Builder
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class OAuth2Attributes {
-
-	public static final String NAVER = "naver";
 
 	private Map<String, Object> attributes;
 	private String provider;
@@ -22,36 +27,37 @@ public class OAuth2Attributes {
 	private String phone;
 	private String email;
 
-	public static OAuth2Attributes of(String provider, String attributeKey, Map<String, Object> attributes) {
-		if (provider.equals(NAVER)) {
-			return ofNaver(provider, attributeKey, attributes);
-		} else {
+	public static OAuth2Attributes of(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
+		try {
+			final String registrationId = userRequest.getClientRegistration().getRegistrationId();
+			return of(SnsProvider.valueOf(registrationId), userRequest, oAuth2User.getAttributes());
+		} catch (Exception e) {
 			throw new UnsupportedPlatformSignInException();
 		}
 	}
 
-	private static OAuth2Attributes ofNaver(String provider, String attributeKey, Map<String, Object> attributes) {
-		final Map<String, Object> response = (Map<String, Object>)attributes.get("response");
-
-		final String phone = response.containsKey("mobile") ? (String)response.get("mobile") : "";
-		final String email = response.containsKey("email") ? (String)response.get("email") : "";
+	private static OAuth2Attributes of(SnsProvider snsProvider, OAuth2UserRequest userRequest, Map<String, Object> attributes) {
+		final Map<String, Object> response = (Map<String, Object>)attributes.get(snsProvider.getResponse());
+		final String userNameAttributeName = userRequest.getClientRegistration()
+			.getProviderDetails()
+			.getUserInfoEndpoint()
+			.getUserNameAttributeName();
 		return OAuth2Attributes.builder()
-			.provider(provider)
-			.phone(phone)
-			.email(email)
+			.provider(snsProvider.getProvider())
+			.phone(response.containsKey(snsProvider.getPhone()) ? (String)response.get(snsProvider.getPhone()) : EMPTY)
+			.email(response.containsKey(snsProvider.getEmail()) ? (String)response.get(snsProvider.getEmail()) : EMPTY)
 			.attributes(response)
-			.attributeKey(attributeKey)
+			.attributeKey(userNameAttributeName)
 			.build();
 	}
 
 	public Map<String, Object> convertToMap() {
 		final Map<String, Object> map = new HashMap<>();
-		map.put("provider", provider);
-		map.put("id", attributeKey);
-		map.put("key", attributeKey);
-		map.put("phone", phone);
-		map.put("email", email);
-
+		map.put("provider", this.provider);
+		map.put("id", this.attributeKey);
+		map.put("key", this.attributeKey);
+		map.put("phone", this.phone);
+		map.put("email", this.email);
 		return map;
 	}
 

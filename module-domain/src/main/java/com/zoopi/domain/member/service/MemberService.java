@@ -1,24 +1,23 @@
 package com.zoopi.domain.member.service;
 
 import static com.zoopi.domain.member.dto.SigninResponse.SigninResult.*;
+import static com.zoopi.exception.response.ErrorCode.*;
+import static com.zoopi.util.Constants.*;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zoopi.domain.authentication.dto.JwtDto;
+import lombok.RequiredArgsConstructor;
+
 import com.zoopi.domain.member.dto.SigninResponse;
 import com.zoopi.domain.member.entity.Member;
-import com.zoopi.domain.member.entity.AuthorityType;
-import com.zoopi.domain.member.entity.MemberAuthority;
 import com.zoopi.domain.member.repository.MemberRepository;
-import com.zoopi.domain.member.repository.MemberAuthorityRepository;
+import com.zoopi.domain.phoneauthentication.dto.JwtDto;
+import com.zoopi.exception.EntityNotFoundException;
 import com.zoopi.util.JwtUtils;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,14 +26,13 @@ public class MemberService {
 
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
-	private final MemberAuthorityRepository memberAuthorityRepository;
 	private final JwtUtils jwtUtils;
 
-	public boolean validateUsername(String username) {
+	public boolean isAvailableUsername(String username) {
 		return memberRepository.findByUsername(username).isEmpty();
 	}
 
-	public boolean validatePhone(String phone) {
+	public boolean isAvailablePhone(String phone) {
 		return memberRepository.findByPhone(phone).isEmpty();
 	}
 
@@ -48,42 +46,42 @@ public class MemberService {
 			.email(email)
 			.build();
 
-		memberRepository.save(member);
-		addUserAuthority(member);
-
-		return member;
-	}
-
-	private void addUserAuthority(Member member) {
-		final MemberAuthority memberAuthority = MemberAuthority.builder()
-			.member(member)
-			.type(AuthorityType.ROLE_USER)
-			.build();
-		memberAuthorityRepository.save(memberAuthority);
+		return memberRepository.save(member);
 	}
 
 	public SigninResponse signin(String username, String password) {
 		final Optional<Member> memberOptional = memberRepository.findByUsername(username);
 		if (memberOptional.isEmpty()) {
-			return new SigninResponse(new JwtDto("", ""), NONEXISTENT_USERNAME);
+			return new SigninResponse(new JwtDto(EMPTY, EMPTY), NONEXISTENT_USERNAME);
 		}
-		final Member member = memberOptional.get();
 
+		final Member member = memberOptional.get();
 		final boolean isMatchedPassword = passwordEncoder.matches(password, member.getPassword());
 		if (!isMatchedPassword) {
-			return new SigninResponse(new JwtDto("", ""), MISMATCHED_PASSWORD);
+			return new SigninResponse(new JwtDto(EMPTY, EMPTY), MISMATCHED_PASSWORD);
 		}
 
-		final List<MemberAuthority> authorities = memberAuthorityRepository.findAllByMember(member);
-		final JwtDto jwt = generateJwt(member, authorities);
-
+		final JwtDto jwt = generateJwt(member);
 		return new SigninResponse(jwt, SUCCESS);
 	}
 
-	private JwtDto generateJwt(Member member, List<MemberAuthority> authorities) {
-		final String accessToken = jwtUtils.generateJwt(member, authorities, JwtUtils.JwtType.ACCESS_TOKEN);
-		final String refreshToken = jwtUtils.generateJwt(member, authorities, JwtUtils.JwtType.REFRESH_TOKEN);
+	public String getUsernameByPhone(String phone) {
+		final Member member = memberRepository.findByPhone(phone)
+			.orElseThrow(() -> new EntityNotFoundException(MEMBER_NOT_FOUND));
+		return member.getUsername();
+	}
 
+	@Transactional
+	public boolean changePassword(String username, String password) {
+		final Member member = memberRepository.findByUsername(username)
+			.orElseThrow(() -> new EntityNotFoundException(MEMBER_NOT_FOUND));
+		member.changePassword(passwordEncoder.encode(password));
+		return true;
+	}
+
+	private JwtDto generateJwt(Member member) {
+		final String accessToken = jwtUtils.generateAccessToken(member);
+		final String refreshToken = jwtUtils.generateRefreshToken(member);
 		return new JwtDto(accessToken, refreshToken);
 	}
 

@@ -1,5 +1,9 @@
 package com.zoopi.domain.member.entity;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -43,6 +47,9 @@ public class Member extends BaseEntity {
 	@Column(name = "phone", unique = true)
 	private String phone;
 
+	@Column(name = "authorities")
+	private String authorities;
+
 	@Builder
 	public Member(String username, String password, String name, String phone, String email) {
 		this.username = username;
@@ -50,6 +57,32 @@ public class Member extends BaseEntity {
 		this.name = name;
 		this.phone = phone;
 		this.email = email;
+		this.authorities = MemberAuthorityTypes.ROLE_USER.name();
+	}
+
+	public boolean addAuthority(MemberAuthorityTypes authority) {
+		if (this.authorities.isEmpty()) {
+			return false;
+		}
+
+		final Set<MemberAuthorityTypes> authorityTypes = Arrays.stream(this.authorities.split(","))
+			.map(MemberAuthorityTypes::valueOf)
+			.collect(Collectors.toSet());
+		for (MemberAuthorityTypes authorityType : authorityTypes) {
+			if (authorityType.equals(authority)) {
+				return false;
+			}
+		}
+
+		authorityTypes.add(authority);
+		this.authorities = authorityTypes.stream()
+			.map(MemberAuthorityTypes::name)
+			.collect(Collectors.joining(","));
+		return true;
+	}
+
+	public void changePassword(String password) {
+		this.password = password;
 	}
 
 }

@@ -1,6 +1,5 @@
 package com.zoopi.config.security.oauth2;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +13,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zoopi.domain.authentication.dto.JwtDto;
+import com.zoopi.domain.phoneauthentication.dto.JwtDto;
 import com.zoopi.util.JwtUtils;
 
 import lombok.AllArgsConstructor;
@@ -29,15 +28,15 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-		Authentication authentication) throws IOException {
+		Authentication authentication) {
 		final OAuth2User user = (OAuth2User)authentication.getPrincipal();
 		final JwtDto jwtDto = generateJwt(user);
 		setResponse(response, jwtDto);
 	}
 
 	private JwtDto generateJwt(OAuth2User oAuth2User) {
-		final String accessToken = jwtUtils.generateJwt(oAuth2User, JwtUtils.JwtType.ACCESS_TOKEN);
-		final String refreshToken = jwtUtils.generateJwt(oAuth2User, JwtUtils.JwtType.REFRESH_TOKEN);
+		final String accessToken = jwtUtils.generateAccessToken(oAuth2User);
+		final String refreshToken = jwtUtils.generateRefreshToken(oAuth2User);
 		return new JwtDto(accessToken, refreshToken);
 	}
 

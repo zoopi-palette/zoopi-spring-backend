@@ -1,4 +1,4 @@
-package com.zoopi.domain.authentication.exception;
+package com.zoopi.domain.phoneauthentication.exception;
 
 import com.zoopi.exception.BusinessException;
 import com.zoopi.exception.response.ErrorCode;
@@ -6,7 +6,7 @@ import com.zoopi.exception.response.ErrorCode;
 public class PasswordMismatchException extends BusinessException {
 
 	public PasswordMismatchException() {
-		super(ErrorCode.PASSWORD_MISMATCHED);
+		super(ErrorCode.PASSWORD_INPUT_MISMATCHED);
 	}
 
 }
