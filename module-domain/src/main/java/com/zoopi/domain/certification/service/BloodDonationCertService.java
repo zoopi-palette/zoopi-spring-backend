@@ -1,9 +1,10 @@
 package com.zoopi.domain.certification.service;
 
-import com.zoopi.domain.certification.repository.BloodDonationCertRepository;
+import org.springframework.stereotype.Service;
+
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.stereotype.Service;
+import com.zoopi.domain.certification.repository.BloodDonationCertRepository;
 
 @Service
 @RequiredArgsConstructor

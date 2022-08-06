@@ -3,6 +3,7 @@ package com.zoopi.domain.certification.repository.dto;
 import java.time.LocalDate;
 
 import com.querydsl.core.annotations.QueryProjection;
+
 import lombok.Data;
 
 @Data

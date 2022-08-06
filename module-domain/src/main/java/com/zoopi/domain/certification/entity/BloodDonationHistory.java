@@ -13,9 +13,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
-import com.zoopi.domain.BaseEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
+import com.zoopi.domain.BaseEntity;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

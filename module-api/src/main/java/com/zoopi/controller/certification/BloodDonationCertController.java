@@ -1,15 +1,16 @@
 package com.zoopi.controller.certification;
 
-import com.zoopi.controller.ResultResponse;
-import com.zoopi.domain.certification.service.BloodDonationCertService;
-import io.swagger.annotations.Api;
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import lombok.RequiredArgsConstructor;
+
+import com.zoopi.controller.ResultResponse;
+import com.zoopi.domain.certification.service.BloodDonationCertService;
 
 @Api(tags = "헌혈 인증 API")
 @RestController

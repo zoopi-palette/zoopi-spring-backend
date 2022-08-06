@@ -8,9 +8,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import com.zoopi.domain.BaseEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
+import com.zoopi.domain.BaseEntity;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
