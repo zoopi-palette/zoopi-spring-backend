@@ -30,6 +30,15 @@ public enum ResultCode {
 
 	// Ban
 	PHONE_BANNED(200, "R-B001", "인증번호 전송이 제한된 휴대폰 번호입니다. 24시간 후 재시도해 주세요."),
+
+	// BloodPost
+	BLOODPOST_REGISTER_SUCCESS(200, "R-BP001", "헌혈 요청글 등록에 성공하였습니다."),
+	BLOODPOST_UPDATE_SUCCESS(200, "R-BP002", "헌혈 요청글 수정에 성공하였습니다."),
+	BLOODPOST_SELECTALL_SUCCESS(200, "R-BP003", "헌혈 요청글 리스트 조회에 성공하였습니다."),
+	BLOODPOST_SELECT_SUCCESS(200, "R-BP004", "헌혈 요청글 상세조회에 성공하였습니다."),
+	BLOODPOST_DELETE_SUCCESS(200, "R-BP005", "헌혈 요청글 삭제에 성공하였습니다."),
+	BLOODPOST_EXPIRE_SUCCESS(200, "R-BP005", "헌혈 요청글 만료에 성공하였습니다."),
+	BLOODPOST_PULL_SUCCESS(200, "R-BP006", "헌혈 요청글 끌어올리기에 성공하였습니다."),
 	;
 
 	private final int status;
