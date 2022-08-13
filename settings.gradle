@@ -1,4 +1,5 @@
 rootProject.name = 'zoopi-spring-backend'
-include 'module-api'
+include 'module-application'
 include 'module-common'
 include 'module-domain'
+include 'module-model'
