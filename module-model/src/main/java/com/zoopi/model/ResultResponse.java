@@ -1,4 +1,4 @@
-package com.zoopi.controller;
+package com.zoopi.model;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

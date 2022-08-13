@@ -1,4 +1,4 @@
-package com.zoopi.exception.response;
+package com.zoopi.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

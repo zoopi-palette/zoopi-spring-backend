@@ -1,4 +1,4 @@
-package com.zoopi.config;
+package com.zoopi.swagger;
 
 import java.util.ArrayList;
 import java.util.List;

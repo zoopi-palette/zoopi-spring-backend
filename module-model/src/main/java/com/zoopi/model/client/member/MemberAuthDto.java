@@ -1,6 +1,5 @@
-package com.zoopi.controller.member.dto;
+package com.zoopi.model.client.member;
 
-import static com.zoopi.controller.ResultCode.*;
 import static com.zoopi.util.Constants.*;
 
 import javax.validation.constraints.NotBlank;
@@ -15,11 +14,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import com.zoopi.controller.ResultCode;
-import com.zoopi.controller.ResultResponse;
-import com.zoopi.domain.member.dto.SigninResponse;
-import com.zoopi.domain.phoneauthentication.dto.response.PhoneAuthenticationResult;
+import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationResult;
 import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationType;
+import com.zoopi.model.ResultCode;
+import com.zoopi.model.ResultResponse;
 
 public class MemberAuthDto {
 
@@ -181,13 +179,13 @@ public class MemberAuthDto {
 		}
 
 		public static ResultResponse fromValidatingUsername(String username, boolean isAvailable) {
-			final ResultCode resultCode = isAvailable ? USERNAME_AVAILABLE : USERNAME_EXISTENT;
+			final ResultCode resultCode = isAvailable ? ResultCode.USERNAME_AVAILABLE : ResultCode.USERNAME_EXISTENT;
 			final ValidationResponse response = ValidationResponse.of(username, isAvailable);
 			return ResultResponse.of(resultCode, response);
 		}
 
 		public static ResultResponse fromValidatingPhone(String phone, boolean isAvailable) {
-			final ResultCode resultCode = isAvailable ? PHONE_AVAILABLE : PHONE_EXISTENT;
+			final ResultCode resultCode = isAvailable ? ResultCode.PHONE_AVAILABLE : ResultCode.PHONE_EXISTENT;
 			final ValidationResponse response = ValidationResponse.of(phone, isAvailable);
 			return ResultResponse.of(resultCode, response);
 		}
@@ -195,20 +193,21 @@ public class MemberAuthDto {
 		public static ResultResponse fromCheckingAuthenticationCode(PhoneAuthenticationResult result, String value) {
 			switch (result) {
 				case EXPIRED:
-					return ResultResponse.of(AUTHENTICATION_CODE_EXPIRED, ValidationResponse.of(value, false));
+					return ResultResponse.of(ResultCode.AUTHENTICATION_CODE_EXPIRED, ValidationResponse.of(value, false));
 				case MISMATCHED:
-					return ResultResponse.of(AUTHENTICATION_CODE_MISMATCHED, ValidationResponse.of(value, false));
+					return ResultResponse.of(
+						ResultCode.AUTHENTICATION_CODE_MISMATCHED, ValidationResponse.of(value, false));
 				default:
-					return ResultResponse.of(AUTHENTICATION_CODE_MATCHED, ValidationResponse.of(value, true));
+					return ResultResponse.of(ResultCode.AUTHENTICATION_CODE_MATCHED, ValidationResponse.of(value, true));
 			}
 		}
 
 		public static ResultResponse fromCheckingUsername(boolean isExistentUsername, String username) {
 			if (isExistentUsername) {
-				return ResultResponse.of(USERNAME_EXISTENT);
+				return ResultResponse.of(ResultCode.USERNAME_EXISTENT);
 			} else {
 				final ValidationResponse response = ValidationResponse.of(username, false);
-				return ResultResponse.of(USERNAME_NONEXISTENT, response);
+				return ResultResponse.of(ResultCode.USERNAME_NONEXISTENT, response);
 			}
 		}
 
@@ -225,7 +224,7 @@ public class MemberAuthDto {
 		}
 
 		public static ResultResponse fromFindingUsername(String username) {
-			return ResultResponse.of(FIND_USERNAME_SUCCESS, UsernameResponse.of(username));
+			return ResultResponse.of(ResultCode.FIND_USERNAME_SUCCESS, UsernameResponse.of(username));
 		}
 
 	}
@@ -235,11 +234,11 @@ public class MemberAuthDto {
 		public static ResultResponse fromSigningIn(SigninResponse response) {
 			switch (response.getResult()) {
 				case NONEXISTENT_USERNAME:
-					return ResultResponse.of(USERNAME_NONEXISTENT, EMPTY);
+					return ResultResponse.of(ResultCode.USERNAME_NONEXISTENT, EMPTY);
 				case MISMATCHED_PASSWORD:
-					return ResultResponse.of(PASSWORD_MISMATCHED, EMPTY);
+					return ResultResponse.of(ResultCode.PASSWORD_MISMATCHED, EMPTY);
 				default:
-					return ResultResponse.of(SIGN_IN_SUCCESS, response.getJwt());
+					return ResultResponse.of(ResultCode.SIGN_IN_SUCCESS, response.getJwt());
 			}
 		}
 

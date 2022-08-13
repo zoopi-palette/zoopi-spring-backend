@@ -1,4 +1,4 @@
-package com.zoopi.domain.phoneauthentication.dto.response;
+package com.zoopi.model.client.pheonauthentication;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

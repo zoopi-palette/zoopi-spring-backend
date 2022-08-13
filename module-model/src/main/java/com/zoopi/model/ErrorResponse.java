@@ -1,6 +1,6 @@
-package com.zoopi.exception.response;
+package com.zoopi.model;
 
-import static com.zoopi.exception.response.ErrorCode.*;
+import static com.zoopi.model.ErrorCode.*;
 
 import java.util.ArrayList;
 import java.util.List;

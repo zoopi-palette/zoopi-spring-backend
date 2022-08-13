@@ -15,19 +15,13 @@ jar {
 }
 
 /**
- * implementation 은 직접 의존하는 모듈(module-common) 외에서는 사용할 수 없다.
- * 따라서 compile(Gradle 7.0 미만) 혹은 api(Gradle 7.0 이상)으로 의존성을 추가해야 한다.
+ * implementation 은 직접 의존하는 모듈에서만 참조가능하다.
+ * compile(Gradle 7.0 미만) 혹은 api(Gradle 7.0 이상) 은 현재 모듈을 의존하는 다른 모듈들도 참조가능하다.
  */
 dependencies {
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.querydsl:querydsl-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
-    api 'org.springframework.boot:spring-boot-starter-security'
-    api 'org.springframework.boot:spring-boot-starter-websocket'
-    api 'org.springframework.boot:spring-boot-starter-validation'
-    api 'org.springframework.boot:spring-boot-starter-web'
 
     testImplementation 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'

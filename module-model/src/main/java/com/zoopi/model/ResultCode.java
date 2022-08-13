@@ -1,4 +1,4 @@
-package com.zoopi.controller;
+package com.zoopi.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

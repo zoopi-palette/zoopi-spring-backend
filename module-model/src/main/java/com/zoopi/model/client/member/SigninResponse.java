@@ -1,6 +1,4 @@
-package com.zoopi.domain.member.dto;
-
-import com.zoopi.domain.phoneauthentication.dto.JwtDto;
+package com.zoopi.model.client.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
