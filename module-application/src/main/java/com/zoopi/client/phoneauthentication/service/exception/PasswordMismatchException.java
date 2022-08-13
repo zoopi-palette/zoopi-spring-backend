@@ -1,4 +1,4 @@
-package com.zoopi.client.service.phoneauthentication.exception;
+package com.zoopi.client.phoneauthentication.service.exception;
 
 import com.zoopi.exception.BusinessException;
 import com.zoopi.ErrorCode;

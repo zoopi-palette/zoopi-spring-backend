@@ -1,4 +1,4 @@
-package com.zoopi.client.service.phoneauthentication;
+package com.zoopi.client.phoneauthentication.service;
 
 import static com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationConstants.*;
 
@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
-import com.zoopi.client.service.phoneauthentication.exception.PasswordMismatchException;
-import com.zoopi.client.model.pheonauthentication.PhoneAuthenticationResponse;
+import com.zoopi.client.phoneauthentication.service.exception.PasswordMismatchException;
+import com.zoopi.client.phoneauthentication.model.PhoneAuthenticationResponse;
 import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationResult;
 import com.zoopi.domain.phoneauthentication.entity.PhoneAuthentication;
 import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationStatus;

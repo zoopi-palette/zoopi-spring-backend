@@ -17,7 +17,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationBan;
 import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationType;
 import com.zoopi.domain.phoneauthentication.repository.PhoneAuthenticationBanRepository;
-import com.zoopi.client.service.phoneauthentication.PhoneAuthenticationBanService;
+import com.zoopi.client.phoneauthentication.service.PhoneAuthenticationBanService;
 
 @ExtendWith(MockitoExtension.class)
 class PhoneAuthenticationBanServiceTest {

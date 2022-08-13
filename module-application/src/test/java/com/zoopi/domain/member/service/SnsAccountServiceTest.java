@@ -16,7 +16,7 @@ import com.zoopi.domain.member.entity.oauth2.SnsAccountPrimaryKey;
 import com.zoopi.domain.member.entity.oauth2.SnsProvider;
 import com.zoopi.domain.member.repository.oauth2.SnsAccountRepository;
 import com.zoopi.domain.member.util.MemberUtils;
-import com.zoopi.client.service.member.SnsAccountService;
+import com.zoopi.client.member.service.SnsAccountService;
 
 @ExtendWith(MockitoExtension.class)
 class SnsAccountServiceTest {

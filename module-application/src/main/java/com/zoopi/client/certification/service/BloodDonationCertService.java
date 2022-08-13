@@ -1,4 +1,4 @@
-package com.zoopi.client.service.certification;
+package com.zoopi.client.certification.service;
 
 import org.springframework.stereotype.Service;
 

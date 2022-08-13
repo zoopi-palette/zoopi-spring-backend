@@ -1,4 +1,4 @@
-package com.zoopi.client.service.phoneauthentication;
+package com.zoopi.client.phoneauthentication.service;
 
 import java.time.LocalDateTime;
 

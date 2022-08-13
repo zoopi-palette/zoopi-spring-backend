@@ -23,8 +23,8 @@ import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.entity.oauth2.SnsAccount;
 import com.zoopi.domain.member.entity.oauth2.SnsAccountPrimaryKey;
 import com.zoopi.domain.member.entity.oauth2.SnsProvider;
-import com.zoopi.client.service.member.MemberService;
-import com.zoopi.client.service.member.SnsAccountService;
+import com.zoopi.client.member.service.MemberService;
+import com.zoopi.client.member.service.SnsAccountService;
 
 @Component
 @RequiredArgsConstructor

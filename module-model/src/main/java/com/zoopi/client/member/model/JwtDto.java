@@ -1,4 +1,4 @@
-package com.zoopi.client.model.member;
+package com.zoopi.client.member.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

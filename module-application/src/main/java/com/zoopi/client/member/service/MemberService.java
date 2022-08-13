@@ -1,7 +1,7 @@
-package com.zoopi.client.service.member;
+package com.zoopi.client.member.service;
 
 import static com.zoopi.ErrorCode.*;
-import static com.zoopi.client.model.member.SigninResponse.SigninResult.*;
+import static com.zoopi.client.member.model.SigninResponse.SigninResult.*;
 import static com.zoopi.util.Constants.*;
 
 import java.util.Optional;
@@ -12,10 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
-import com.zoopi.client.model.member.SigninResponse;
+import com.zoopi.client.member.model.SigninResponse;
 import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.repository.MemberRepository;
-import com.zoopi.client.model.member.JwtDto;
+import com.zoopi.client.member.model.JwtDto;
 import com.zoopi.exception.EntityNotFoundException;
 import com.zoopi.util.JwtUtils;
 

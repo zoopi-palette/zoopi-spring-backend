@@ -1,6 +1,6 @@
-package com.zoopi.client.api.member;
+package com.zoopi.client.member.api;
 
-import static com.zoopi.client.model.member.MemberAuthDto.*;
+import static com.zoopi.client.member.model.MemberAuthDto.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;

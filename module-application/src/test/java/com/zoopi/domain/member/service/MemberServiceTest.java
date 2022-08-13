@@ -20,8 +20,8 @@ import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.repository.MemberRepository;
 import com.zoopi.domain.member.util.MemberUtils;
 import com.zoopi.exception.EntityNotFoundException;
-import com.zoopi.client.model.member.SigninResponse;
-import com.zoopi.client.service.member.MemberService;
+import com.zoopi.client.member.model.SigninResponse;
+import com.zoopi.client.member.service.MemberService;
 import com.zoopi.util.JwtUtils;
 
 @ExtendWith(MockitoExtension.class)

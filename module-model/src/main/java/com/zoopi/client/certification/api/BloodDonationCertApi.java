@@ -1,4 +1,4 @@
-package com.zoopi.client.api.certification;
+package com.zoopi.client.certification.api;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

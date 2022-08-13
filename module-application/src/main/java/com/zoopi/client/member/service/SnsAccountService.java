@@ -1,4 +1,4 @@
-package com.zoopi.client.service.member;
+package com.zoopi.client.member.service;
 
 import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.entity.oauth2.SnsAccount;

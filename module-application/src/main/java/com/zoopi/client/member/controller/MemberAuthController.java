@@ -1,8 +1,8 @@
-package com.zoopi.client.controller.member;
+package com.zoopi.client.member.controller;
 
 import static com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationConstants.*;
 import static com.zoopi.ResultCode.*;
-import static com.zoopi.client.model.member.MemberAuthDto.*;
+import static com.zoopi.client.member.model.MemberAuthDto.*;
 import static com.zoopi.util.Constants.*;
 
 import org.springframework.http.ResponseEntity;
@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 
-import com.zoopi.client.api.member.MemberAuthApi;
+import com.zoopi.client.member.api.MemberAuthApi;
 import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationResult;
 import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationType;
 import com.zoopi.ResultResponse;
-import com.zoopi.client.model.member.SigninResponse;
-import com.zoopi.client.model.pheonauthentication.PhoneAuthenticationResponse;
-import com.zoopi.client.service.member.MemberService;
-import com.zoopi.client.service.phoneauthentication.PhoneAuthenticationBanService;
-import com.zoopi.client.service.phoneauthentication.PhoneAuthenticationService;
+import com.zoopi.client.member.model.SigninResponse;
+import com.zoopi.client.phoneauthentication.model.PhoneAuthenticationResponse;
+import com.zoopi.client.member.service.MemberService;
+import com.zoopi.client.phoneauthentication.service.PhoneAuthenticationBanService;
+import com.zoopi.client.phoneauthentication.service.PhoneAuthenticationService;
 import com.zoopi.util.AuthenticationCodeUtils;
 
 @RestController

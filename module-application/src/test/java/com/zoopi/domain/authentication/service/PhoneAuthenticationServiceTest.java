@@ -23,9 +23,9 @@ import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationStatus;
 import com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationType;
 import com.zoopi.domain.phoneauthentication.repository.PhoneAuthenticationRepository;
 import com.zoopi.infra.sms.SmsClient;
-import com.zoopi.client.model.pheonauthentication.PhoneAuthenticationResponse;
-import com.zoopi.client.service.phoneauthentication.PhoneAuthenticationService;
-import com.zoopi.client.service.phoneauthentication.exception.PasswordMismatchException;
+import com.zoopi.client.phoneauthentication.model.PhoneAuthenticationResponse;
+import com.zoopi.client.phoneauthentication.service.PhoneAuthenticationService;
+import com.zoopi.client.phoneauthentication.service.exception.PasswordMismatchException;
 import com.zoopi.util.AuthenticationCodeUtils;
 
 @ExtendWith(MockitoExtension.class)

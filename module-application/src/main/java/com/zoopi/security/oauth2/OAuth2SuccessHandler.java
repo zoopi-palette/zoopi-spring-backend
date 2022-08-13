@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.zoopi.ResultResponse;
-import com.zoopi.client.model.member.JwtDto;
+import com.zoopi.client.member.model.JwtDto;
 import com.zoopi.util.JwtUtils;
 
 import lombok.RequiredArgsConstructor;
