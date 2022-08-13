@@ -1,6 +1,6 @@
 package com.zoopi.util;
 
-import static com.zoopi.model.ErrorCode.*;
+import static com.zoopi.ErrorCode.*;
 import static com.zoopi.security.oauth2.CustomOAuth2UserService.*;
 import static com.zoopi.util.Constants.*;
 import static com.zoopi.util.JwtUtils.JwtType.*;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 
 import com.zoopi.domain.member.entity.Member;
 import com.zoopi.exception.InvalidRequestHeaderException;
-import com.zoopi.model.ErrorResponse.FieldError;
+import com.zoopi.ErrorResponse.FieldError;
 import com.zoopi.security.jwt.JwtAuthenticationToken;
 
 import io.jsonwebtoken.Claims;

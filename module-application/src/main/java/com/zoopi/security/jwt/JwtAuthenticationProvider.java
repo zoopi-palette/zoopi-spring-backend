@@ -1,6 +1,6 @@
 package com.zoopi.security.jwt;
 
-import static com.zoopi.model.ErrorCode.*;
+import static com.zoopi.ErrorCode.*;
 import static com.zoopi.util.Constants.*;
 
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -16,7 +16,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 
 import com.zoopi.security.jwt.exception.JwtAuthenticationException;
-import com.zoopi.model.ErrorResponse.FieldError;
+import com.zoopi.ErrorResponse.FieldError;
 import com.zoopi.util.JwtUtils;
 
 @Component

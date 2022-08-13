@@ -1,6 +1,6 @@
 package com.zoopi.advice;
 
-import static com.zoopi.model.ErrorCode.*;
+import static com.zoopi.ErrorCode.*;
 
 import javax.validation.ConstraintViolationException;
 
@@ -17,8 +17,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import com.zoopi.exception.BusinessException;
-import com.zoopi.model.ErrorCode;
-import com.zoopi.model.ErrorResponse;
+import com.zoopi.ErrorCode;
+import com.zoopi.ErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

@@ -1,6 +1,6 @@
 package com.zoopi.domain.member.service;
 
-import static com.zoopi.model.ErrorCode.*;
+import static com.zoopi.ErrorCode.*;
 import static com.zoopi.util.Constants.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,8 +20,8 @@ import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.repository.MemberRepository;
 import com.zoopi.domain.member.util.MemberUtils;
 import com.zoopi.exception.EntityNotFoundException;
-import com.zoopi.model.client.member.SigninResponse;
-import com.zoopi.service.member.MemberService;
+import com.zoopi.client.model.member.SigninResponse;
+import com.zoopi.client.service.member.MemberService;
 import com.zoopi.util.JwtUtils;
 
 @ExtendWith(MockitoExtension.class)

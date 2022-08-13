@@ -1,6 +1,6 @@
 package com.zoopi.security.oauth2;
 
-import static com.zoopi.model.ResultCode.*;
+import static com.zoopi.ResultCode.*;
 
 import java.io.OutputStream;
 
@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.zoopi.model.ResultResponse;
-import com.zoopi.model.client.member.JwtDto;
+import com.zoopi.ResultResponse;
+import com.zoopi.client.model.member.JwtDto;
 import com.zoopi.util.JwtUtils;
 
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.zoopi.exception;
 
-import com.zoopi.model.ErrorCode;
+import com.zoopi.ErrorCode;
 
 public class EntityNotFoundException extends BusinessException {
 

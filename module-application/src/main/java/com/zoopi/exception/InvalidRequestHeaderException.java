@@ -2,8 +2,8 @@ package com.zoopi.exception;
 
 import java.util.List;
 
-import com.zoopi.model.ErrorCode;
-import com.zoopi.model.ErrorResponse;
+import com.zoopi.ErrorCode;
+import com.zoopi.ErrorResponse;
 
 public class InvalidRequestHeaderException extends BusinessException {
 

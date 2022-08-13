@@ -1,6 +1,6 @@
 package com.zoopi.security.handler;
 
-import static com.zoopi.model.ErrorCode.*;
+import static com.zoopi.ErrorCode.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,7 +15,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zoopi.model.ErrorResponse;
+import com.zoopi.ErrorResponse;
 
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {

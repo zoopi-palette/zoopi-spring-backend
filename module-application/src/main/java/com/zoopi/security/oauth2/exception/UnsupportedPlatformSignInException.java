@@ -1,7 +1,7 @@
 package com.zoopi.security.oauth2.exception;
 
 import com.zoopi.security.exception.CustomAuthenticationException;
-import com.zoopi.model.ErrorCode;
+import com.zoopi.ErrorCode;
 
 public class UnsupportedPlatformSignInException extends CustomAuthenticationException {
 

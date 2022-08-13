@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zoopi.security.exception.CustomAuthenticationException;
-import com.zoopi.model.ErrorResponse;
+import com.zoopi.ErrorResponse;
 
 import lombok.RequiredArgsConstructor;
 
