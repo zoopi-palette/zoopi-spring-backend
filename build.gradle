@@ -51,9 +51,18 @@ subprojects {
 }
 
 /**
- * 각각 module-api, module-service 모듈에 module-common 의존성을 추가
+ * module 의존관계 설정
  */
-project(':module-api') {
+
+project(':module-application') {
+	dependencies {
+		implementation project(':module-common')
+		implementation project(':module-domain')
+		implementation project(':module-model')
+	}
+}
+
+project(':module-model') {
 	dependencies {
 		implementation project(':module-common')
 		implementation project(':module-domain')

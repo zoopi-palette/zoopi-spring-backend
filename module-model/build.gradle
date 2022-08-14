@@ -1,0 +1,18 @@
+/**
+ * bootJar 는 실행 가능한 jar을 만들기에, main 함수 필요
+ * main 함수가 없는 모듈이므로 enabled = false 설정 추가
+ */
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+}

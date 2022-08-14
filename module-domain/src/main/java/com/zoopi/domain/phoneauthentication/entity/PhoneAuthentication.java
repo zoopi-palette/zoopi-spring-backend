@@ -1,6 +1,6 @@
 package com.zoopi.domain.phoneauthentication.entity;
 
-import static com.zoopi.domain.phoneauthentication.service.PhoneAuthenticationService.*;
+import static com.zoopi.domain.phoneauthentication.entity.PhoneAuthenticationConstants.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import com.zoopi.domain.BaseEntity;
-import com.zoopi.domain.phoneauthentication.dto.response.PhoneAuthenticationResult;
 
 @Entity
 @Getter
@@ -90,6 +89,7 @@ public class PhoneAuthentication extends BaseEntity {
 
 	/**
 	 * 휴대폰 본인인증정보가 유효한지 검증한다.
+	 *
 	 * @return 인증결과
 	 */
 	public PhoneAuthenticationResult validate() {
