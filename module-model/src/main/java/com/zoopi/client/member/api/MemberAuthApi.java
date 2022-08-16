@@ -79,9 +79,9 @@ public interface MemberAuthApi {
 			+ "status: 200 | code: R-M002 | message: 존재하는 아이디입니다."),
 		@ApiResponse(code = 500, response = ErrorResponse.class, message = "Internal Server Error")
 	})
-	@ApiImplicitParam(name = "username", value = "아이디 (최대 30자)", required = true, example = "zoopi")
+	@ApiImplicitParam(name = "username", value = "아이디 (정규표현식: ^[A-Za-z0-9]{6,20}$)", required = true, example = "zoopi123")
 	@PostMapping("/username/validate")
-	ResponseEntity<ResultResponse> validateUsername(@RequestParam @Size(max = 30) String username);
+	ResponseEntity<ResultResponse> validateUsername(@RequestParam @Pattern(regexp = "^[A-Za-z0-9]{6,20}$") String username);
 
 	@ApiOperation(value = "휴대폰 번호 유효성 검사")
 	@ApiResponses({
