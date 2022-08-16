@@ -4,7 +4,6 @@ import static com.zoopi.client.member.model.MemberAuthDto.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
