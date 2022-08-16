@@ -67,19 +67,19 @@ public class MemberAuthDto {
 		@ApiModelProperty(value = "휴대폰 번호(정규표현식: ^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$)", required = true, example = "01012345678")
 		private String phone;
 
-		@NotBlank
-		@Size(max = 30)
-		@ApiModelProperty(value = "아이디(최대 30자)", required = true, example = "zoopi123")
+		@NotNull
+		@Pattern(regexp = "^[A-Za-z0-9]{6,20}$")
+		@ApiModelProperty(value = "아이디(정규표현식: ^[A-Za-z0-9]{6,20}$)", required = true, example = "zoopi123")
 		private String username;
 
 		@NotNull
 		@Pattern(regexp = "^.*(?=^.{10,20}$)(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#$%^&*()+=]).*$")
-		@ApiModelProperty(value = "비밀번호(정규표현식:^.*(?=^.{10,20}$)(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#$%^&*()+=]).*$)", required = true, example = "1234asdf!@#$")
+		@ApiModelProperty(value = "비밀번호(정규표현식: ^.*(?=^.{10,20}$)(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#$%^&*()+=]).*$)", required = true, example = "1234asdf!@#$")
 		private String password;
 
 		@NotNull
 		@Pattern(regexp = "^.*(?=^.{10,20}$)(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#$%^&*()+=]).*$")
-		@ApiModelProperty(value = "비밀번호 확인(정규표현식:^.*(?=^.{10,20}$)(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#$%^&*()+=]).*$)", required = true, example = "1234asdf!@#$")
+		@ApiModelProperty(value = "비밀번호 확인(정규표현식: ^.*(?=^.{10,20}$)(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#$%^&*()+=]).*$)", required = true, example = "1234asdf!@#$")
 		private String passwordCheck;
 
 	}
@@ -97,7 +97,7 @@ public class MemberAuthDto {
 
 		@NotNull
 		@Pattern(regexp = "^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$")
-		@ApiModelProperty(value = "휴대폰 번호(정규표현식:^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$)", required = true, example = "01012345678")
+		@ApiModelProperty(value = "휴대폰 번호(정규표현식: ^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$)", required = true, example = "01012345678")
 		private String phone;
 
 	}
@@ -125,9 +125,9 @@ public class MemberAuthDto {
 	@NoArgsConstructor(access = AccessLevel.PROTECTED)
 	public static class SigninRequest {
 
-		@NotBlank
-		@Size(max = 30)
-		@ApiModelProperty(value = "아이디(최대 30자)", required = true, example = "zoopi123")
+		@NotNull
+		@Pattern(regexp = "^[A-Za-z0-9]{6,20}$")
+		@ApiModelProperty(value = "아이디(정규표현식: ^[A-Za-z0-9]{6,20}$)", required = true, example = "zoopi123")
 		private String username;
 
 		@NotNull
@@ -143,9 +143,9 @@ public class MemberAuthDto {
 	@NoArgsConstructor(access = AccessLevel.PROTECTED)
 	public static class SignupRequest {
 
-		@NotBlank
-		@Size(max = 30)
-		@ApiModelProperty(value = "아이디(최대 30자)", required = true, example = "zoopi123")
+		@NotNull
+		@Pattern(regexp = "^[A-Za-z0-9]{6,20}$")
+		@ApiModelProperty(value = "아이디(정규표현식: ^[A-Za-z0-9]{6,20}$)", required = true, example = "zoopi123")
 		private String username;
 
 		@NotNull
@@ -160,7 +160,7 @@ public class MemberAuthDto {
 
 		@NotNull
 		@Pattern(regexp = "^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$")
-		@ApiModelProperty(value = "휴대폰 번호(정규표현식:^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$)", required = true, example = "01012341234")
+		@ApiModelProperty(value = "휴대폰 번호(정규표현식: ^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$)", required = true, example = "01012341234")
 		private String phone;
 
 		@NotBlank
