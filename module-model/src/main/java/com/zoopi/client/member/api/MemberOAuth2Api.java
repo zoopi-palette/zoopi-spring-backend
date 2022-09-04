@@ -50,7 +50,7 @@ public interface MemberOAuth2Api {
 			+ "status: 200 | code: R-M006 | message: 로그인에 성공하였습니다."),
 		@ApiResponse(code = 500, response = ErrorResponse.class, message = "Internal Server Error")
 	})
-	@PostMapping(value = "/signin/app", headers = "AccessToken")
+	@PostMapping(value = "/signin/app")
 	ResponseEntity<ResultResponse> signinApp(@Valid @RequestBody SigninAppRequest request);
 
 }
