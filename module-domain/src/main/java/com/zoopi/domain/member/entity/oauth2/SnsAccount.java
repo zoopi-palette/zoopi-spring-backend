@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "sns_acounts")
+@Table(name = "sns_accounts")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
