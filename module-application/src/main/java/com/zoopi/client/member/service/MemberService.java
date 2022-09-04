@@ -12,10 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
+import com.zoopi.client.member.model.JwtDto;
 import com.zoopi.client.member.model.SigninResponse;
 import com.zoopi.domain.member.entity.Member;
 import com.zoopi.domain.member.repository.MemberRepository;
-import com.zoopi.client.member.model.JwtDto;
 import com.zoopi.exception.EntityNotFoundException;
 import com.zoopi.util.JwtUtils;
 
@@ -37,7 +37,7 @@ public class MemberService {
 	}
 
 	@Transactional
-	public Member createMember(String username, String phone, String name, String password, String email) {
+	public Member signup(String username, String phone, String name, String password, String email) {
 		final Member member = Member.builder()
 			.username(username)
 			.password(passwordEncoder.encode(password))
@@ -79,7 +79,7 @@ public class MemberService {
 		return true;
 	}
 
-	private JwtDto generateJwt(Member member) {
+	public JwtDto generateJwt(Member member) {
 		final String accessToken = jwtUtils.generateAccessToken(member);
 		final String refreshToken = jwtUtils.generateRefreshToken(member);
 		return new JwtDto(accessToken, refreshToken);
