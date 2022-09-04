@@ -80,7 +80,8 @@ public interface MemberAuthApi {
 	})
 	@ApiImplicitParam(name = "username", value = "아이디 (정규표현식: ^[A-Za-z0-9]{6,20}$)", required = true, example = "zoopi123")
 	@PostMapping("/username/validate")
-	ResponseEntity<ResultResponse> validateUsername(@RequestParam @Pattern(regexp = "^[A-Za-z0-9]{6,20}$") String username);
+	ResponseEntity<ResultResponse> validateUsername(
+		@RequestParam @Pattern(regexp = "^[A-Za-z0-9]{6,20}$") String username);
 
 	@ApiOperation(value = "휴대폰 번호 유효성 검사")
 	@ApiResponses({
@@ -96,7 +97,8 @@ public interface MemberAuthApi {
 
 	@ApiOperation(value = "휴대폰 본인 인증 문자 전송")
 	@ApiResponses({
-		@ApiResponse(code = 201, response = Void.class, message = "status: 200 | code: R-B001 | message: 인증번호 전송이 제한된 휴대폰 번호입니다. 24시간 후 재시도해 주세요."),
+		@ApiResponse(code = 201, response = Void.class, message = ""
+			+ "status: 200 | code: R-B001 | message: 인증번호 전송이 제한된 휴대폰 번호입니다. 24시간 후 재시도해 주세요."),
 		@ApiResponse(code = 202, response = PhoneAuthenticationResponse.class, message = ""
 			+ "status: 200 | code: R-A005 | message: 인증 코드 전송에 성공하였습니다."),
 		@ApiResponse(code = 500, response = ErrorResponse.class, message = "Internal Server Error")

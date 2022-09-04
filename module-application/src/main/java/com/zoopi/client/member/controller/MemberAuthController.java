@@ -92,7 +92,7 @@ public class MemberAuthController implements MemberAuthApi {
 
 		response = ValidationResponse.fromCheckingAuthenticationCode(result, request.getPhone());
 		if (response.getCode().equals(AUTHENTICATION_CODE_MATCHED.getCode())) {
-			memberService.createMember(request.getUsername(), request.getPhone(), EMPTY, request.getPassword(), EMPTY);
+			memberService.signup(request.getUsername(), request.getPhone(), EMPTY, request.getPassword(), EMPTY);
 			response = ResultResponse.of(SIGN_UP_SUCCESS);
 		}
 
