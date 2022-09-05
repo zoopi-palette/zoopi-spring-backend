@@ -7,10 +7,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum SnsProvider {
 
-    NAVER("naver", "response", "mobile", "email");
+    NAVER("NAVER", "response", "id", "mobile", "email");
 
     private final String provider;
     private final String response;
+    private final String id;
     private final String phone;
     private final String email;
 

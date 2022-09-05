@@ -103,7 +103,7 @@ class MemberServiceTest {
 		given(memberRepository.save(any(Member.class))).willReturn(member);
 
 		// when
-		final Member savedMember = memberService.createMember(member.getUsername(), member.getPhone(), member.getName(),
+		final Member savedMember = memberService.signup(member.getUsername(), member.getPhone(), member.getName(),
 			member.getPassword(), member.getEmail());
 
 		// then

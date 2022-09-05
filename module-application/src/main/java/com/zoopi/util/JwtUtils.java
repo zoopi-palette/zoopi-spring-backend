@@ -1,7 +1,7 @@
 package com.zoopi.util;
 
 import static com.zoopi.ErrorCode.*;
-import static com.zoopi.security.oauth2.CustomOAuth2UserService.*;
+import static com.zoopi.security.oauth2.OAuth2Attributes.*;
 import static com.zoopi.util.Constants.*;
 import static com.zoopi.util.JwtUtils.JwtType.*;
 
@@ -41,9 +41,10 @@ public class JwtUtils {
 	private static final String CLAIM_PRIMARY_KEY = "pk";
 	private static final String HEADER_TYPE = "typ";
 	private static final String TOKEN_NAME = "JWT";
-	private static final String TOKEN_TYPE = "Bearer"; // RFC 6750: JWT, OAuth 2.0 token are bearer tokens
 	private static final String TOKEN_ISSUER = "zoopi";
 	private static final int TOKEN_PREFIX_LENGTH = 7;
+
+	public static final String TOKEN_TYPE = "Bearer"; // RFC 6750: JWT, OAuth 2.0 token are bearer tokens
 
 	@Value("${jwt.access-validity}")
 	private long ACCESS_TOKEN_VALIDITY;
