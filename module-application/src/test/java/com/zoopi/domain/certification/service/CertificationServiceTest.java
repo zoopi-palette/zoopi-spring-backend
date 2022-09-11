@@ -60,9 +60,9 @@ class CertificationServiceTest {
 	public void mapHistoryAndDetail_happy_case() {
 		// given
 		when(detailRepository.findByHistoryIdsIn(mapFrom(histories, BloodDonationHistory::getId))).thenReturn(details);
-		when(chatMessageRepository.findByChatRoomIdAndType(100L, MessageType.THANKS)).thenReturn(Optional.empty());
-		when(chatMessageRepository.findByChatRoomIdAndType(200L, MessageType.THANKS)).thenReturn(Optional.of(chatMessage));
-		when(chatMessageRepository.findByChatRoomIdAndType(300L, MessageType.THANKS)).thenReturn(Optional.empty());
+		when(chatMessageRepository.findByChatRoomIdAndType(100L, MessageType.THANKS)).thenReturn(null);
+		when(chatMessageRepository.findByChatRoomIdAndType(200L, MessageType.THANKS)).thenReturn(chatMessage);
+		when(chatMessageRepository.findByChatRoomIdAndType(300L, MessageType.THANKS)).thenReturn(null);
 
 		// when
 		final Map<BloodDonationHistory, CertDetailDto> res = certificationService.mapHistoryAndDetail(histories);

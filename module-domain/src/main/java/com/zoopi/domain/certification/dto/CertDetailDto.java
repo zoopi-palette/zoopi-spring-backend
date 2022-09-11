@@ -1,6 +1,7 @@
 package com.zoopi.domain.certification.dto;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import lombok.Getter;
 
@@ -16,13 +17,14 @@ public class CertDetailDto {
 	private String thanksMessage = null;
 	private LocalDateTime thanksMessageAt = null;
 
-	public CertDetailDto(BloodDonationDetail detail) {
+	public CertDetailDto(BloodDonationDetail detail, ChatMessage thanksMessage) {
 		this.bloodDonationDetailId = detail.getId();
 		this.receiverPet = detail.getReceiverPet();
+
+		Optional.ofNullable(thanksMessage).ifPresent(thanks -> {
+			this.thanksMessage = thanks.getMessage();
+			this.thanksMessageAt = thanks.getCreatedAt();
+		});
 	}
 
-	public void setThanksMessage(ChatMessage thanksMessage) {
-		this.thanksMessage = thanksMessage.getMessage();
-		this.thanksMessageAt = thanksMessage.getCreatedAt();
-	}
 }

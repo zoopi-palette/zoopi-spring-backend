@@ -15,6 +15,7 @@ import com.zoopi.domain.certification.entity.BloodDonationDetail;
 import com.zoopi.domain.certification.entity.BloodDonationHistory;
 import com.zoopi.domain.certification.repository.BloodDonationDetailRepository;
 import com.zoopi.domain.certification.repository.BloodDonationHistoryRepository;
+import com.zoopi.domain.chat.entity.ChatMessage;
 import com.zoopi.domain.chat.entity.MessageType;
 import com.zoopi.domain.chat.repository.ChatMessageRepository;
 
@@ -41,10 +42,8 @@ public class CertificationService {
 	}
 
 	public CertDetailDto makeCertDetailDto(BloodDonationDetail detail) {
-		final CertDetailDto detailDto = new CertDetailDto(detail);
-		chatMessageRepository.findByChatRoomIdAndType(detail.getChatRoomId(), MessageType.THANKS)
-			.ifPresent(detailDto::setThanksMessage);
-		return detailDto;
+		ChatMessage thanksMessage = chatMessageRepository.findByChatRoomIdAndType(detail.getChatRoomId(), MessageType.THANKS);
+		return new CertDetailDto(detail, thanksMessage);
 	}
 
 }
