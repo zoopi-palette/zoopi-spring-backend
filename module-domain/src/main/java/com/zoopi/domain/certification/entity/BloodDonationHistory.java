@@ -35,7 +35,7 @@ public class BloodDonationHistory extends BaseEntity {
 	private Pet pet;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "receiver_pet_id", referencedColumnName = "receiver_pet_id")
+	@JoinColumn(name = "receiver_pet_id", referencedColumnName = "pet_id")
 	private Pet receiverPet;
 
 	private String imageUrl;

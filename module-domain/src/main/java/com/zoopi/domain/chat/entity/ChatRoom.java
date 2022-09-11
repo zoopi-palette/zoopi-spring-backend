@@ -32,7 +32,7 @@ public class ChatRoom extends BaseEntity {
 	private Long postId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "donor_id", referencedColumnName = "donor_id")
+	@JoinColumn(name = "donor_id", referencedColumnName = "pet_id")
 	private Pet donor;
 
 	private Boolean alarmFlag;
