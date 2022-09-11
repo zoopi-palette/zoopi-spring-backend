@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +24,7 @@ import com.zoopi.domain.pet.entity.Pet;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Getter
 public class BloodDonationHistory extends BaseEntity {
 
@@ -33,10 +35,6 @@ public class BloodDonationHistory extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "pet_id", referencedColumnName = "pet_id")
 	private Pet pet;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "receiver_pet_id", referencedColumnName = "pet_id")
-	private Pet receiverPet;
 
 	private String imageUrl;
 

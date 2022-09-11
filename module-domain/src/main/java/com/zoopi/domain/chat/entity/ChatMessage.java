@@ -12,19 +12,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import com.zoopi.domain.BaseEntity;
 
-enum MessageType {
-
-	GENERAL, THANKS
-
-}
-
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Getter
 public class ChatMessage extends BaseEntity {
 
