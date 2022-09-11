@@ -4,7 +4,6 @@ import static com.zoopi.util.FunctionalUtils.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +34,10 @@ public class CertificationService {
 	public Map<BloodDonationHistory, CertDetailDto> mapHistoryAndDetail(List<BloodDonationHistory> histories) {
 		final List<Long> ids = mapFrom(histories, BloodDonationHistory::getId);
 		final List<BloodDonationDetail> details = detailRepository.findByHistoryIdsIn(ids);
-		return associateFrom(details, BloodDonationDetail::getHistory, this::makeCertDetailDto);
+		final Map<Long, CertDetailDto> certDtoMap =
+			associateFrom(details, detail -> detail.getHistory().getId(), this::makeCertDetailDto);
+
+		return associateFrom(histories, history -> history, history -> certDtoMap.get(history.getId()));
 	}
 
 	public CertDetailDto makeCertDetailDto(BloodDonationDetail detail) {
