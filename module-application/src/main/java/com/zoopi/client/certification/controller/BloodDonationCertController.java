@@ -20,7 +20,7 @@ public class BloodDonationCertController implements BloodDonationCertApi {
 	@GetMapping("/{petId}")
 	public ResponseEntity<ResultResponse> retrieveCertification(Long petId) {
 		return ResponseEntity.ok(
-			ResultResponse.of(ResultCode.SIGN_IN_SUCCESS, certService.retrieveCertification(petId))
+			ResultResponse.of(ResultCode.OK, certService.retrieveCertification(petId))
 		);
 	}
 
