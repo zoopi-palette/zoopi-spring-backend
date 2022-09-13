@@ -31,7 +31,7 @@ public class CertificationService {
 		return historyRepository.findAllByPetId(petId);
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public Map<BloodDonationHistory, CertDetailDto> mapHistoryAndDetail(List<BloodDonationHistory> histories) {
 		final List<Long> ids = mapFrom(histories, BloodDonationHistory::getId);
 		final List<BloodDonationDetail> details = detailRepository.findByHistoryIdsIn(ids);

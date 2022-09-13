@@ -2,20 +2,23 @@ package com.zoopi.domain.certification.service;
 
 import static com.zoopi.domain.certification.entity.BloodDonationType.*;
 import static com.zoopi.util.FunctionalUtils.*;
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.zoopi.domain.certification.dto.CertDetailDto;
 import com.zoopi.domain.certification.entity.BloodDonationDetail;
 import com.zoopi.domain.certification.entity.BloodDonationHistory;
-import com.zoopi.domain.certification.repository.BloodDonationDetailRepository;
+import com.zoopi.domain.certification.repository.BloodDonationDetailRepositoryQueryDslImpl;
 import com.zoopi.domain.certification.repository.BloodDonationHistoryRepository;
 import com.zoopi.domain.chat.entity.ChatMessage;
 import com.zoopi.domain.chat.entity.ChatRoom;
@@ -25,17 +28,17 @@ import com.zoopi.domain.chat.repository.ChatMessageRepository;
 import com.zoopi.domain.hospital.entity.Hospital;
 import com.zoopi.domain.pet.entity.Pet;
 
+@ExtendWith(MockitoExtension.class)
 class CertificationServiceTest {
 
-	private final BloodDonationHistoryRepository historyRepository = mock(BloodDonationHistoryRepository.class);
-	private final BloodDonationDetailRepository detailRepository = mock(BloodDonationDetailRepository.class);
-	private final ChatMessageRepository chatMessageRepository = mock(ChatMessageRepository.class);
-
-	private final CertificationService certificationService = new CertificationService(
-		historyRepository,
-		detailRepository,
-		chatMessageRepository
-	);
+	@Mock
+	private BloodDonationHistoryRepository historyRepository;
+	@Mock
+	private BloodDonationDetailRepositoryQueryDslImpl detailRepository;
+	@Mock
+	private ChatMessageRepository chatMessageRepository;
+	@InjectMocks
+	private CertificationService certificationService;
 
 	private final Pet donorPet = Pet.builder().build();
 	private final Pet receiverPet = Pet.builder().build();
@@ -54,15 +57,16 @@ class CertificationServiceTest {
 		new BloodDonationDetail(3L, receiverPet, 300L, "", histories.get(3))
 	);
 	private final ChatRoom chatRoom = new ChatRoom(200L, 2L, donorPet, true, ChatRoomStatus.DONE);
-	private final ChatMessage chatMessage = new ChatMessage(1000L, chatRoom, 1L, "헌혈해주셔서 감사합니다 :)", MessageType.THANKS, true);
+	private final ChatMessage chatMessage = new ChatMessage(1000L, chatRoom, 1L, "헌혈해주셔서 감사합니다 :)", MessageType.THANKS,
+		true);
 
 	@Test
-	public void mapHistoryAndDetail_happy_case() {
+	void mapHistoryAndDetail_happy_case() {
 		// given
-		when(detailRepository.findByHistoryIdsIn(mapFrom(histories, BloodDonationHistory::getId))).thenReturn(details);
-		when(chatMessageRepository.findByChatRoomIdAndType(100L, MessageType.THANKS)).thenReturn(null);
-		when(chatMessageRepository.findByChatRoomIdAndType(200L, MessageType.THANKS)).thenReturn(chatMessage);
-		when(chatMessageRepository.findByChatRoomIdAndType(300L, MessageType.THANKS)).thenReturn(null);
+		given(detailRepository.findByHistoryIdsIn(mapFrom(histories, BloodDonationHistory::getId))).willReturn(details);
+		given(chatMessageRepository.findByChatRoomIdAndType(100L, MessageType.THANKS)).willReturn(null);
+		given(chatMessageRepository.findByChatRoomIdAndType(200L, MessageType.THANKS)).willReturn(chatMessage);
+		given(chatMessageRepository.findByChatRoomIdAndType(300L, MessageType.THANKS)).willReturn(null);
 
 		// when
 		final Map<BloodDonationHistory, CertDetailDto> res = certificationService.mapHistoryAndDetail(histories);
@@ -71,10 +75,13 @@ class CertificationServiceTest {
 		res.forEach((history, dto) -> {
 			if (history.getType().equals(APPOINT)) {
 				assertNotNull(dto);
-				if (history.getId() == 2) assertEquals(dto.getThanksMessage(), "헌혈해주셔서 감사합니다 :)");
-				else assertNull(dto.getThanksMessage());
-			}
-			else if (history.getType().equals(GENERAL)) assertNull(dto);
+				if (history.getId() == 2) {
+					assertEquals(dto.getThanksMessage(), "헌혈해주셔서 감사합니다 :)");
+				} else {
+					assertNull(dto.getThanksMessage());
+				}
+			} else if (history.getType().equals(GENERAL))
+				assertNull(dto);
 		});
 	}
 
