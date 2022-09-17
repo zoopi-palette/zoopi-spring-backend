@@ -7,6 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ResultCode {
 
+	// Common
+	OK(200, "-200", ""),
+
 	// Member
 	USERNAME_AVAILABLE(200, "R-M001", "사용 가능한 아이디입니다."),
 	USERNAME_EXISTENT(200, "R-M002", "존재하는 아이디입니다."),

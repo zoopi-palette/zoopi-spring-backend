@@ -11,35 +11,40 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import com.zoopi.domain.BaseEntity;
+import com.zoopi.domain.hospital.entity.Hospital;
+import com.zoopi.domain.pet.entity.Pet;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Getter
 public class BloodDonationHistory extends BaseEntity {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "blood_donation_history_id")
 	private Long id;
 
-	private Long petId;
-	private Long receiverPetId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "pet_id", referencedColumnName = "pet_id")
+	private Pet pet;
 
-	@OneToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "blood_donation_detail_id")
-	private BloodDonationDetail detail;
-
-	@Column(name = "image")
 	private String imageUrl;
 
-	private Long hospitalId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "hospital_id", referencedColumnName = "hospital_id")
+	private Hospital hospital;
 
 	private LocalDate bloodDonationAt;
 
 	@Enumerated(EnumType.STRING)
 	private BloodDonationType type;
+
 }

@@ -14,6 +14,6 @@ import com.zoopi.ResultResponse;
 public interface BloodDonationCertApi {
 
 	@GetMapping("/{petId}")
-	ResponseEntity<ResultResponse> findCertification(@PathVariable Long petId);
+	ResponseEntity<ResultResponse> retrieveCertification(@PathVariable Long petId);
 
 }
