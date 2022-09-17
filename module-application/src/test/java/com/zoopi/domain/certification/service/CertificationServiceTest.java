@@ -61,7 +61,7 @@ class CertificationServiceTest {
 		true);
 
 	@Test
-	void mapHistoryAndDetail_happy_case() {
+	void mapHistoryAndDetail_정상조회_확인() {
 		// given
 		given(detailRepository.findByHistoryIdsIn(mapFrom(histories, BloodDonationHistory::getId))).willReturn(details);
 		given(chatMessageRepository.findByChatRoomIdAndType(100L, MessageType.THANKS)).willReturn(null);

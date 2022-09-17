@@ -2,6 +2,7 @@ package com.zoopi.client.certification.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class BloodDonationCertController implements BloodDonationCertApi {
 	private final BloodDonationCertService certService;
 
 	@GetMapping("/{petId}")
-	public ResponseEntity<ResultResponse> retrieveCertification(Long petId) {
+	public ResponseEntity<ResultResponse> retrieveCertification(@PathVariable Long petId) {
 		return ResponseEntity.ok(
 			ResultResponse.of(ResultCode.OK, certService.retrieveCertification(petId))
 		);

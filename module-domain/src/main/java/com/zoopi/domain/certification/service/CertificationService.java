@@ -28,7 +28,7 @@ public class CertificationService {
 	private final ChatMessageRepository chatMessageRepository;
 
 	public List<BloodDonationHistory> findAllHistoryBy(Long petId) {
-		return historyRepository.findAllByPetId(petId);
+		return historyRepository.findAllFetchPetBy(petId);
 	}
 
 	@Transactional(readOnly = true)
